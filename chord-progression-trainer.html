@@ -1314,22 +1314,28 @@ function scaleKeyboardSVG(rootSemi, isMinor) {
   const MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10];
   const scaleIvs = isMinor ? MINOR_SCALE : MAJOR_SCALE;
   const scalePC = new Set(scaleIvs.map(iv => (rootSemi + iv) % 12));
+  const rootMod = ((rootSemi % 12) + 12) % 12;
   const W = 18, H = 60, BW = 11, BH = 37;
-  let white = '', black = '';
+  let white = '', black = '', dots = '';
   WHITE_SEMIS.forEach((s, i) => {
     const x = i * W;
     const inScale = scalePC.has(s);
+    const isRoot = s === rootMod;
     white += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="2"
       fill="${inScale ? 'var(--accent)' : '#fff'}" stroke="#888" stroke-width="1"/>`;
+    if (isRoot) dots += `<circle cx="${x + W / 2}" cy="${H - 9}" r="3.5" fill="#fff"/>`;
   });
   Object.entries(BLACK_POS).forEach(([s, pos]) => {
+    const pc = Number(s);
     const x = pos * W - BW / 2;
-    const inScale = scalePC.has(Number(s));
+    const inScale = scalePC.has(pc);
+    const isRoot = pc === rootMod;
     black += `<rect x="${x}" y="0" width="${BW}" height="${BH}" rx="1.5"
       fill="${inScale ? 'var(--accent)' : '#222'}" stroke="#000" stroke-width="0.5"/>`;
+    if (isRoot) dots += `<circle cx="${x + BW / 2}" cy="${BH - 7}" r="3" fill="#fff"/>`;
   });
   return `<svg class="scale-kbd-svg" viewBox="0 0 ${7 * W} ${H}"
-    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}</svg>`;
+    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}${dots}</svg>`;
 }
 
 // Liefert für den gewählten Voicing-Typ Intervalle + Label, mit Fallback auf Akkordtöne
