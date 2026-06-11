@@ -6,8 +6,8 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 
 echo "Node-Version: $(node --version)"
-echo "Starte Testsuite (node --test tests/) ..."
+echo "Starte Testsuite (node --test tests/*.test.mjs) ..."
 echo
 
-node --test tests/
+node --test tests/*.test.mjs
 exit $?

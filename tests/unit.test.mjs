@@ -72,9 +72,11 @@ test('Schema: jede Progression hat name/style/difficulty/mode/chords/roman', () 
 });
 
 test('Schema: Progressionsnamen sind eindeutig (Favoriten/Schwer-Set arbeiten namensbasiert)', () => {
+  // Hinweis: Arrays aus der vm-Sandbox haben einen fremden Prototyp,
+  // daher Längenvergleich statt deepStrictEqual gegen ein Host-[].
   const names = PROGRESSIONS.map(p => p.name);
   const dupes = names.filter((n, i) => names.indexOf(n) !== i);
-  assert.deepEqual(dupes, [], 'Doppelte Namen: ' + dupes.join(', '));
+  assert.equal(dupes.length, 0, 'Doppelte Namen: ' + [...dupes].join(', '));
 });
 
 // ---------- Transposition ----------
