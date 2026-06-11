@@ -1308,33 +1308,41 @@ function keyboardSVG(rootSemi, intervals) {
     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}${marker}</svg>`;
 }
 
-/// Skalenklaviatur: 1 Oktave, weiß/schwarz, Skalentöne orange
+// Skalenklaviatur: 1 Oktave ab Grundton, weiß/schwarz, Skalentöne orange
 function scaleKeyboardSVG(rootSemi, isMinor) {
   const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11];
   const MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10];
   const scaleIvs = isMinor ? MINOR_SCALE : MAJOR_SCALE;
-  const scalePC = new Set(scaleIvs.map(iv => (rootSemi + iv) % 12));
   const rootMod = ((rootSemi % 12) + 12) % 12;
+  const scalePC = new Set(scaleIvs.map(iv => (rootMod + iv) % 12));
   const W = 18, H = 60, BW = 11, BH = 37;
+  // Fenster Grundton..Grundton+Oktave; bei schwarzem Grundton ab der weißen Taste darunter
+  const lo = WHITE_SEMIS.includes(rootMod) ? rootMod : rootMod - 1;
+  const hi = lo + 12;
+  const offsetIdx = WHITE_SEMIS.indexOf(lo);
   let white = '', black = '', dots = '';
-  WHITE_SEMIS.forEach((s, i) => {
-    const x = i * W;
-    const inScale = scalePC.has(s);
-    const isRoot = s === rootMod;
-    white += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="2"
-      fill="${inScale ? 'var(--accent)' : '#fff'}" stroke="#888" stroke-width="1"/>`;
-    if (isRoot) dots += `<circle cx="${x + W / 2}" cy="${H - 9}" r="3.5" fill="#fff"/>`;
-  });
-  Object.entries(BLACK_POS).forEach(([s, pos]) => {
-    const pc = Number(s);
-    const x = pos * W - BW / 2;
-    const inScale = scalePC.has(pc);
-    const isRoot = pc === rootMod;
-    black += `<rect x="${x}" y="0" width="${BW}" height="${BH}" rx="1.5"
-      fill="${inScale ? 'var(--accent)' : '#222'}" stroke="#000" stroke-width="0.5"/>`;
-    if (isRoot) dots += `<circle cx="${x + BW / 2}" cy="${BH - 7}" r="3" fill="#fff"/>`;
-  });
-  return `<svg class="scale-kbd-svg" viewBox="0 0 ${7 * W} ${H}"
+  for (let oct = 0; oct < 2; oct++) {
+    WHITE_SEMIS.forEach((s, i) => {
+      const semi = oct * 12 + s;
+      if (semi < lo || semi > hi) return;
+      const x = (oct * 7 + i - offsetIdx) * W;
+      const inScale = scalePC.has(s);
+      white += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="2"
+        fill="${inScale ? 'var(--accent)' : '#fff'}" stroke="#888" stroke-width="1"/>`;
+      if (s === rootMod) dots += `<circle cx="${x + W / 2}" cy="${H - 9}" r="3.5" fill="#fff"/>`;
+    });
+    Object.entries(BLACK_POS).forEach(([s, pos]) => {
+      const pc = Number(s);
+      const semi = oct * 12 + pc;
+      if (semi < lo || semi > hi) return;
+      const x = (oct * 7 + pos - offsetIdx) * W - BW / 2;
+      const inScale = scalePC.has(pc);
+      black += `<rect x="${x}" y="0" width="${BW}" height="${BH}" rx="1.5"
+        fill="${inScale ? 'var(--accent)' : '#222'}" stroke="#000" stroke-width="0.5"/>`;
+      if (pc === rootMod) dots += `<circle cx="${x + BW / 2}" cy="${BH - 7}" r="3" fill="#fff"/>`;
+    });
+  }
+  return `<svg class="scale-kbd-svg" viewBox="0 0 ${8 * W} ${H}"
     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}${dots}</svg>`;
 }
 
