@@ -162,10 +162,19 @@
   .chord-area {
     flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 20px;
     min-height: 0;
     position: relative;
+  }
+
+  .key-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
   }
 
   .chords-container {
@@ -178,16 +187,25 @@
 
   .key-large {
     font-family: 'Fraunces', serif;
-    font-size: clamp(26px, 3.2vw, 38px);
+    font-size: clamp(28px, 3.4vw, 42px);
     color: var(--text-muted);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    letter-spacing: 0.06em;
     opacity: 0;
     animation: fadeIn 0.6s 0.2s forwards;
   }
   .key-large strong {
     color: var(--accent);
     font-weight: 500;
+  }
+
+  .scale-kbd {
+    opacity: 0;
+    animation: fadeIn 0.6s 0.25s forwards;
+  }
+  .scale-kbd-svg {
+    width: clamp(196px, 21vw, 252px);
+    height: auto;
+    display: block;
   }
 
   .chords {
@@ -284,6 +302,7 @@
   /* Fade-out class triggered when changing progression */
   .fading-out .chord-wrapper,
   .fading-out .key-large,
+  .fading-out .scale-kbd,
   .fading-out .header,
   .fading-out .transition-bar {
     animation: fadeOut 0.25s forwards !important;
@@ -729,8 +748,11 @@
   </div>
 
   <div class="chord-area" id="chordArea">
-    <div class="chords-container" id="chordsContainer">
+    <div class="key-block">
       <div class="key-large" id="keyLarge"></div>
+      <div class="scale-kbd" id="scaleKbd"></div>
+    </div>
+    <div class="chords-container" id="chordsContainer">
       <div class="chords" id="chordsDisplay"></div>
       <div class="blind-hint" id="blindHint"></div>
     </div>
@@ -1286,6 +1308,41 @@ function keyboardSVG(rootSemi, intervals) {
     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}${marker}</svg>`;
 }
 
+// Skalenklaviatur: 2 Oktaven, Skalentöne blau, Grundton orange hervorgehoben
+function scaleKeyboardSVG(rootSemi, isMinor) {
+  const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11];
+  const MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10];
+  const scaleIvs = isMinor ? MINOR_SCALE : MAJOR_SCALE;
+  const rootMod = ((rootSemi % 12) + 12) % 12;
+  const scalePC = new Set(scaleIvs.map(iv => (rootSemi + iv) % 12));
+  const W = 14, H = 48, BW = 9, BH = 29;
+  let white = '', black = '', marker = '';
+  for (let oct = 0; oct < 2; oct++) {
+    WHITE_SEMIS.forEach((s, i) => {
+      const x = (oct * 7 + i) * W;
+      const inScale = scalePC.has(s);
+      const isRoot = s === rootMod;
+      const fill   = isRoot ? 'var(--accent)' : inScale ? 'var(--func-subdom)' : 'var(--bg-card)';
+      const stroke = inScale ? 'var(--bg-base)' : 'var(--border-subtle)';
+      white += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="2"
+        fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
+      if (isRoot) marker += `<circle cx="${x + W / 2}" cy="${H - 9}" r="4" fill="var(--bg-base)"/>`;
+    });
+    Object.entries(BLACK_POS).forEach(([s, pos]) => {
+      const pc = Number(s);
+      const x = (oct * 7 + pos) * W - BW / 2;
+      const inScale = scalePC.has(pc);
+      const isRoot = pc === rootMod;
+      const fill = isRoot ? 'var(--accent)' : inScale ? 'var(--func-subdom)' : 'var(--bg-base)';
+      black += `<rect x="${x}" y="0" width="${BW}" height="${BH}" rx="1.5"
+        fill="${fill}" stroke="var(--bg-base)" stroke-width="0.5"/>`;
+      if (isRoot) marker += `<circle cx="${x + BW / 2}" cy="${BH - 7}" r="3" fill="var(--bg-base)"/>`;
+    });
+  }
+  return `<svg class="scale-kbd-svg" viewBox="0 0 ${14 * W} ${H}"
+    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}${marker}</svg>`;
+}
+
 // Liefert für den gewählten Voicing-Typ Intervalle + Label, mit Fallback auf Akkordtöne
 function voicingForType(v, type) {
   if (type === 'shell' && v.shellIv) return { iv: v.shellIv, label: 'Shell ' + v.shell };
@@ -1464,7 +1521,10 @@ function render(skipAnim = false) {
     styleEl.innerHTML = `${currentProg.style} <span style="opacity:0.5; margin-left:8px; font-weight:400; text-transform:none; letter-spacing:0;">orig. ${currentProg.originalKey}</span>`;
   }
 
-  document.getElementById('keyLarge').innerHTML = `<strong>${currentProg.key}${currentProg.mode === 'minor' ? 'm' : ''}</strong>`;
+  const keyLabel = currentProg.key + (currentProg.mode === 'minor' ? 'm' : '');
+  document.getElementById('keyLarge').innerHTML = `<strong>${keyLabel}</strong>`;
+  const scaleRootSemi = NOTE_TO_SEMI[currentProg.key] ?? 0;
+  document.getElementById('scaleKbd').innerHTML = scaleKeyboardSVG(scaleRootSemi, currentProg.mode === 'minor');
 
   const hintEl = document.getElementById('transitionHint');
   if (showTransition && prevProg) {
