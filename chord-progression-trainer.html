@@ -203,7 +203,7 @@
     animation: fadeIn 0.6s 0.25s forwards;
   }
   .scale-kbd-svg {
-    width: clamp(196px, 21vw, 252px);
+    width: clamp(110px, 12vw, 148px);
     height: auto;
     display: block;
   }
@@ -1308,39 +1308,28 @@ function keyboardSVG(rootSemi, intervals) {
     xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}${marker}</svg>`;
 }
 
-// Skalenklaviatur: 2 Oktaven, Skalentöne blau, Grundton orange hervorgehoben
+/// Skalenklaviatur: 1 Oktave, weiß/schwarz, Skalentöne orange
 function scaleKeyboardSVG(rootSemi, isMinor) {
   const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11];
   const MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10];
   const scaleIvs = isMinor ? MINOR_SCALE : MAJOR_SCALE;
-  const rootMod = ((rootSemi % 12) + 12) % 12;
   const scalePC = new Set(scaleIvs.map(iv => (rootSemi + iv) % 12));
-  const W = 14, H = 48, BW = 9, BH = 29;
-  let white = '', black = '', marker = '';
-  for (let oct = 0; oct < 2; oct++) {
-    WHITE_SEMIS.forEach((s, i) => {
-      const x = (oct * 7 + i) * W;
-      const inScale = scalePC.has(s);
-      const isRoot = s === rootMod;
-      const fill   = isRoot ? 'var(--accent)' : inScale ? 'var(--func-subdom)' : 'var(--bg-card)';
-      const stroke = inScale ? 'var(--bg-base)' : 'var(--border-subtle)';
-      white += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="2"
-        fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
-      if (isRoot) marker += `<circle cx="${x + W / 2}" cy="${H - 9}" r="4" fill="var(--bg-base)"/>`;
-    });
-    Object.entries(BLACK_POS).forEach(([s, pos]) => {
-      const pc = Number(s);
-      const x = (oct * 7 + pos) * W - BW / 2;
-      const inScale = scalePC.has(pc);
-      const isRoot = pc === rootMod;
-      const fill = isRoot ? 'var(--accent)' : inScale ? 'var(--func-subdom)' : 'var(--bg-base)';
-      black += `<rect x="${x}" y="0" width="${BW}" height="${BH}" rx="1.5"
-        fill="${fill}" stroke="var(--bg-base)" stroke-width="0.5"/>`;
-      if (isRoot) marker += `<circle cx="${x + BW / 2}" cy="${BH - 7}" r="3" fill="var(--bg-base)"/>`;
-    });
-  }
-  return `<svg class="scale-kbd-svg" viewBox="0 0 ${14 * W} ${H}"
-    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}${marker}</svg>`;
+  const W = 18, H = 60, BW = 11, BH = 37;
+  let white = '', black = '';
+  WHITE_SEMIS.forEach((s, i) => {
+    const x = i * W;
+    const inScale = scalePC.has(s);
+    white += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="2"
+      fill="${inScale ? 'var(--accent)' : '#fff'}" stroke="#888" stroke-width="1"/>`;
+  });
+  Object.entries(BLACK_POS).forEach(([s, pos]) => {
+    const x = pos * W - BW / 2;
+    const inScale = scalePC.has(Number(s));
+    black += `<rect x="${x}" y="0" width="${BW}" height="${BH}" rx="1.5"
+      fill="${inScale ? 'var(--accent)' : '#222'}" stroke="#000" stroke-width="0.5"/>`;
+  });
+  return `<svg class="scale-kbd-svg" viewBox="0 0 ${7 * W} ${H}"
+    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${white}${black}</svg>`;
 }
 
 // Liefert für den gewählten Voicing-Typ Intervalle + Label, mit Fallback auf Akkordtöne
