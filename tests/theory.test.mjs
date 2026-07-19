@@ -150,30 +150,9 @@ function checkPair(chord, roman) {
   return findings;
 }
 
-// Bekannte Inkonsistenzen: Progressionen nicht in C notiert (zentraler App-Bug).
-// Als todo markiert, damit CI grün bleibt bis der Bug gefixt ist.
-// Ursache: transposeProgression rechnet relativ zu C, aber diese Progressionen
-// wurden in einer anderen Tonika notiert (Am, Dm, F, G statt C/Cm).
-const KNOWN_TONIC_BUGS = new Set([
-  'Andalusisch (i–bVII–bVI–bVII)',
-  'i–bVI–bIII–bVII',
-  'Girl from Ipanema A',
-  'Lament Bass',
-  'Flamenco-Kadenz',
-  'i–bIII–bVII–IV',
-  'Livin\' on a Prayer (Verse/Chorus)',
-  'Wonderwall (Verse)',
-  'I Will Survive (Quintenzirkel)',
-  'Dorian Vamp',
-  'Mixolydian Vamp',
-]);
-
 // ---------- Tests: jede Progression einzeln ----------
 for (const prog of PROGRESSIONS) {
-  const opts = KNOWN_TONIC_BUGS.has(prog.name)
-    ? { todo: 'bekannter Bug: Progression nicht in C notiert, Tonartanzeige/-transposition falsch' }
-    : {};
-  test(`Stufensymbole vs. Akkorde: ${prog.name}`, opts, () => {
+  test(`Stufensymbole vs. Akkorde: ${prog.name}`, () => {
     const allFindings = [];
     const offsets = [];
     prog.chords.forEach((chord, i) => {
