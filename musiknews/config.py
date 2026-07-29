@@ -29,9 +29,9 @@ MV_STAEDTE = [
     "Greifswald", "Hamburg", "Lübeck", "Berlin",
 ]
 
-CLAUDE_MODEL = "claude-sonnet-5"
-CLAUDE_MAX_TOKENS = 1024
-CLAUDE_SEARCH_MAX_USES = 3
+# Claude Code CLI (läuft über Max-Abo, kein API-Key nötig)
+CLAUDE_CMD = "claude"
+CLAUDE_TIMEOUT = 120  # Sekunden pro Künstler
 
 # --- MusicBrainz (Phase 2) ---
 MUSICBRAINZ_USER_AGENT = "MusikNewsTool/1.0 (stotco@googlemail.com)"

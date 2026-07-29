@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Phase 4 — Recherche-Agent: tägliche Newssuche per Claude-API mit Web-Search.
+"""Phase 4 — Recherche-Agent: tägliche Newssuche per Claude Code CLI.
+
+Läuft über das Max-Abo (kein API-Key nötig). Claude Code wird im
+Headless-Modus aufgerufen (`claude -p "…" --output-format json`).
 
 Tier A (Priorität A): täglich abfragen.
 Tier B (Priorität B/C): wöchentlich rotierend (~55 pro Tag).
@@ -13,28 +16,20 @@ Ergebnisse → Tabelle `news` mit Dedupe über hash(kuenstler, typ, ereignis_dat
 import argparse
 import hashlib
 import json
-import os
 import sqlite3
+import subprocess
 import sys
-import time
 from datetime import date, timedelta
 from pathlib import Path
 
 from config import (
-    CLAUDE_MAX_TOKENS,
-    CLAUDE_MODEL,
-    CLAUDE_SEARCH_MAX_USES,
+    CLAUDE_CMD,
+    CLAUDE_TIMEOUT,
     DB_PATH,
     MV_STAEDTE,
     TIER_A_TAEGLICH,
     TIER_B_PRO_TAG,
 )
-
-try:
-    import anthropic
-except ImportError:
-    print("FEHLER: anthropic-Paket nicht installiert. pip install anthropic", file=sys.stderr)
-    sys.exit(1)
 
 
 NEWS_SCHEMA = """
@@ -101,31 +96,40 @@ Antworte ausschließlich als JSON-Array. Jedes Element:
 Beispiel für eine leere Antwort: []"""
 
 
-def recherche_kuenstler(client, name: str, heute: date) -> list[dict]:
-    """Führt eine Claude-API-Suche für einen Künstler durch."""
+def recherche_kuenstler(name: str, heute: date) -> list[dict]:
+    """Führt eine Claude-Code-CLI-Suche für einen Künstler durch."""
     prompt = _build_prompt(name, heute)
 
     try:
-        response = client.messages.create(
-            model=CLAUDE_MODEL,
-            max_tokens=CLAUDE_MAX_TOKENS,
-            messages=[{"role": "user", "content": prompt}],
-            tools=[{
-                "type": "web_search_20260318",
-                "name": "web_search",
-                "max_uses": CLAUDE_SEARCH_MAX_USES,
-            }],
+        result = subprocess.run(
+            [CLAUDE_CMD, "-p", prompt, "--output-format", "json"],
+            capture_output=True, text=True, timeout=CLAUDE_TIMEOUT,
         )
-    except Exception as e:
-        print(f"    API-Fehler: {e}", file=sys.stderr)
+    except FileNotFoundError:
+        print(f"\n    FEHLER: '{CLAUDE_CMD}' nicht gefunden. "
+              "Claude Code CLI installieren: https://docs.anthropic.com/en/docs/claude-code",
+              file=sys.stderr)
+        sys.exit(1)
+    except subprocess.TimeoutExpired:
+        print(f"Timeout ({CLAUDE_TIMEOUT}s)", file=sys.stderr)
         return []
 
-    text_blocks = []
-    for block in response.content:
-        if hasattr(block, "text"):
-            text_blocks.append(block.text)
+    if result.returncode != 0:
+        stderr = result.stderr.strip()[:200] if result.stderr else ""
+        print(f"CLI-Fehler (exit {result.returncode}): {stderr}", file=sys.stderr)
+        return []
 
-    full_text = "\n".join(text_blocks)
+    try:
+        cli_output = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        cli_output = None
+
+    if isinstance(cli_output, dict) and "result" in cli_output:
+        full_text = cli_output["result"]
+    elif isinstance(cli_output, str):
+        full_text = cli_output
+    else:
+        full_text = result.stdout
 
     start = full_text.find("[")
     end = full_text.rfind("]")
@@ -138,7 +142,7 @@ def recherche_kuenstler(client, name: str, heute: date) -> list[dict]:
             return []
         return results
     except json.JSONDecodeError:
-        print(f"    JSON-Parse-Fehler", file=sys.stderr)
+        print(f"JSON-Parse-Fehler", file=sys.stderr)
         return []
 
 
@@ -187,14 +191,13 @@ def run(limit: int | None = None, dry_run: bool = False):
         conn.close()
         return
 
-    client = anthropic.Anthropic()
     stats = {"gesucht": 0, "gefunden": 0, "duplikate": 0, "fehler": 0}
 
     for i, artist in enumerate(artists):
         print(f"  [{i+1}/{len(artists)}] [{artist['tier']}] {artist['name']} …",
               end=" ", flush=True)
 
-        results = recherche_kuenstler(client, artist["name"], heute)
+        results = recherche_kuenstler(artist["name"], heute)
         stats["gesucht"] += 1
 
         if not results:
