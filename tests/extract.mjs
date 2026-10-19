@@ -30,6 +30,9 @@ const EXPORT_NAMES = [
   // Zustandsbezogene Helfer (nutzen localStorage-Stub)
   'loadHard', 'saveHard', 'loadFavorites', 'saveFavorites',
   'loadStats', 'saveStats', 'pickNextProgression', 'formatDuration',
+  // Metronom (reine Helfer + Laden/Speichern)
+  'clampBpm', 'normalizeSubdiv', 'metroStepSec', 'metroIsBeat',
+  'loadMetro', 'saveMetro', 'METRO_MIN', 'METRO_MAX', 'METRO_DEFAULT',
 ];
 
 export function readHtml() {
