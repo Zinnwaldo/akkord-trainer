@@ -119,8 +119,59 @@ test('Ansicht umschalten und Standards rendern läuft mit DOM-Stubs', () => {
   const app = loadApp();
   assert.doesNotThrow(() => { app.exports.setView('standards'); app.exports.setView('trainer'); });
   const sections = app.sandbox.document.getElementById('stdSections').innerHTML;
-  assert.match(sections, /std-bar/);
-  assert.match(sections, /func-(tonic|subdom|dominant|other)/);
+  assert.match(sections, /hw-chord/);
+  assert.match(sections, /hw-pair/);
+  assert.match(sections, /hw-f-(tonic|subdom|dominant|other)/);
+});
+
+test('Tonzentren: jeder Abschnitt vollständig und lesbar eingetragen', () => {
+  for (const s of JAZZ_STANDARDS) {
+    for (const sec of s.sections) {
+      assert.ok(Array.isArray(sec.centers) && sec.centers.length, `${s.title} ${sec.label}: centers fehlt`);
+      const n = parseBars(sec.chords).flat().length;
+      const sum = sec.centers.reduce((a, [, k]) => a + k, 0);
+      assert.equal(sum, n, `${s.title} ${sec.label}: ${sum} Zentren-Akkorde ≠ ${n} Akkorde`);
+      for (const [k] of sec.centers) assert.ok(parseSongKey(k), `${s.title}: Tonzentrum ${k}`);
+    }
+  }
+});
+
+test('Tonzentren wandern mit der Transposition, lokale Stufen bleiben', () => {
+  const al = JAZZ_STANDARDS.find(s => s.title === 'Autumn Leaves');
+  const orig = transposeStandard(al, '');
+  assert.deepEqual(plain(orig.sections[0].centers.map(c => [c.key, c.rel])), [['Bb', 'bIII'], ['Gm', 'i']]);
+  assert.deepEqual(plain(orig.sections[0].bars.flat().map(x => x.local)),
+    ['ii7', 'V7', 'Imaj7', 'IVmaj7', 'iiø', 'V7', 'i', 'i']);
+  const em = transposeStandard(al, 'E');
+  assert.deepEqual(plain(em.sections[0].centers.map(c => c.key)), ['G', 'Em']);
+  assert.deepEqual(plain(em.sections[0].bars.flat().map(x => x.local)),
+    plain(orig.sections[0].bars.flat().map(x => x.local)));
+  const attya = transposeStandard(JAZZ_STANDARDS.find(s => s.title === 'All the Things You Are'), 'C');
+  assert.deepEqual(plain(attya.sections[0].centers.map(c => c.key)), ['C', 'E']);
+});
+
+test('Beziehungen: Quintfall, SubV, II–V, sonst neutral', () => {
+  const { stdHwRelation: rel } = X;
+  assert.equal(rel('Dm7', 'G7'), 'pair');
+  assert.equal(rel('Am7b5', 'D7'), 'pair');
+  assert.equal(rel('Abm7', 'Db7'), 'pair');
+  assert.equal(rel('G7', 'Cmaj7'), 'fifth');
+  assert.equal(rel('C7#5', 'Fm7'), 'fifth');
+  assert.equal(rel('Db7', 'C6'), 'half');
+  assert.equal(rel('Cmaj7', 'Dm7'), 'none');
+  assert.equal(rel('Fm7', 'Bbm7'), 'none');
+});
+
+test('Gruppen: Tonika erreicht → „in“, sonst nur angesteuert', () => {
+  const { stdHwSegments } = X;
+  const satin = transposeStandard(JAZZ_STANDARDS.find(s => s.title === 'Satin Doll'), '');
+  const g = stdHwSegments(satin.sections[0]);
+  assert.deepEqual(plain(g.map(x => [x.center.key, x.reached])),
+    [['C', false], ['D', false], ['G', false], ['C', true]]);
+  // gleiche Akkorde hintereinander werden zusammengefasst (C6 | C6 → 2 Takte)
+  const last = g[3].items[g[3].items.length - 1];
+  assert.equal(last.chord, 'C6');
+  assert.equal(last.dur, 2);
 });
 
 test('Transposition schreibt Grundtöne nach Buchstaben-Abstand (Ab → C: F#m7, nicht Gbm7)', () => {

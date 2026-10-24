@@ -37,6 +37,8 @@ const EXPORT_NAMES = [
   'JAZZ_STANDARDS', 'parseBars', 'parseSongKey', 'keyPrefersFlats', 'standardRoman',
   'transposeStandard', 'loadSetlist', 'saveSetlist', 'setlistAdd', 'setlistRemove',
   'setlistMove', 'escapeHTML', 'renderStandards', 'setView',
+  // Harmonie-Wege (Standards-Darstellung)
+  'stdHwRelation', 'stdHwSegments', 'stdHwRelKey',
 ];
 
 export function readHtml() {
