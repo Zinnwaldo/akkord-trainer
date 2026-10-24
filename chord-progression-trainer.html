@@ -763,6 +763,166 @@
     color: var(--text-muted);
   }
 
+  /* ============ ANSICHTEN (Trainer / Jazz Standards) ============ */
+  .view-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .view-tab {
+    padding: 6px 14px;
+    font-size: 12px;
+    background: transparent;
+    color: var(--text-muted);
+  }
+  .view-tab.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .standards-view { display: none; }
+  body.view-standards .main { grid-column: 1 / -1; grid-row: 1 / -1; }
+  body.view-standards .controls,
+  body.view-standards .sidebar,
+  body.view-standards .progress-bar,
+  body.view-standards .chord-area,
+  body.view-standards .transition-bar,
+  body.view-standards .progression-name,
+  body.view-standards .progression-meta,
+  body.view-standards .timer-display { display: none; }
+  body.view-standards .standards-view {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 32px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ============ JAZZ STANDARDS ============ */
+  .std-side, .std-main {
+    overflow-y: auto;
+    min-height: 0;
+  }
+  .std-side h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  .std-side h3 + * { margin-bottom: 24px; }
+  .std-list, .std-setlist {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .std-item { align-items: flex-start; }
+  .std-item.active { background: var(--bg-card); border-color: var(--accent); }
+  .std-set-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .std-set-row .history-item { flex: 1; min-width: 0; }
+  .std-set-row .std-mini {
+    padding: 4px 7px;
+    font-size: 11px;
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-muted);
+  }
+  .std-set-row .std-mini:hover { color: var(--accent); border-color: var(--border-emphasis); }
+  .std-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .std-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .std-head button { margin-left: auto; padding: 6px 12px; font-size: 12px; }
+  .std-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+  }
+  .std-meta strong { color: var(--accent); font-weight: 600; }
+  .std-tools {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .std-section { margin-bottom: 22px; }
+  .std-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .std-section-label span {
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  .std-bars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 8px;
+  }
+  .std-bar {
+    display: flex;
+    justify-content: space-around;
+    gap: 6px;
+    padding: 8px 10px;
+    border-left: 2px solid var(--border-emphasis);
+    min-height: 64px;
+  }
+  .std-bar:nth-child(4n), .std-bar:last-child { border-right: 2px solid var(--border-emphasis); }
+  .std-chord { text-align: center; }
+  .std-chord .chord { font-size: clamp(18px, 2.2vw, 26px); }
+  .std-chord .chord-roman { font-size: 12px; min-height: 0; margin-top: 4px; }
+  .std-section.variant .std-section-label { color: var(--text-secondary); }
+  .std-section.variant .std-chord .chord { font-size: clamp(14px, 1.6vw, 18px); }
+  .std-section.variant .std-bar { min-height: 44px; padding: 5px 8px; }
+  .std-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 6px;
+  }
+  .std-caveat {
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 12px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 880px) {
+    body.view-standards .standards-view {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      overflow-y: auto;
+    }
+    .std-side, .std-main { overflow: visible; }
+    .std-main { order: -1; }
+  }
+  @media (max-width: 600px) {
+    .std-bars { grid-template-columns: repeat(2, 1fr); }
+    .std-bar:nth-child(2n) { border-right: 2px solid var(--border-emphasis); }
+  }
+
   /* Mobile layout */
   @media (max-width: 880px) {
     body {
@@ -793,6 +953,10 @@
 
 <!-- ============ MAIN ============ -->
 <div class="main">
+  <nav class="view-tabs" aria-label="Ansicht">
+    <button class="view-tab active" id="tabTrainer" aria-pressed="true">Trainer</button>
+    <button class="view-tab" id="tabStandards" aria-pressed="false">Jazz Standards</button>
+  </nav>
   <div class="header" id="header">
     <div class="progression-name" id="progName">—</div>
     <div class="progression-meta">
@@ -830,6 +994,32 @@
   </div>
 
   <div class="transition-bar" id="transitionHint"></div>
+
+  <!-- ============ JAZZ STANDARDS ============ -->
+  <section class="standards-view" id="standardsView" aria-label="Jazz Standards">
+    <aside class="std-side">
+      <h3>Standards</h3>
+      <div class="std-list" id="stdList"></div>
+      <h3>Meine Setlist</h3>
+      <div class="std-setlist" id="stdSetlist"></div>
+    </aside>
+    <div class="std-main">
+      <div class="std-head">
+        <div class="std-title" id="stdTitle">—</div>
+        <button id="btnStdSetlist" title="In die Setlist übernehmen">+ Setlist</button>
+      </div>
+      <div class="std-meta" id="stdMeta"></div>
+      <div class="std-tools">
+        <div class="pill-group" id="stdKeys"></div>
+        <label class="toggle">
+          <input type="checkbox" id="stdRoman" checked>
+          <span>Stufen</span>
+        </label>
+      </div>
+      <div id="stdSections"></div>
+      <div class="std-caveat" id="stdCaveat"></div>
+    </div>
+  </section>
 </div>
 
 <!-- ============ CONTROLS ============ -->
@@ -1968,6 +2158,8 @@ document.getElementById('metroSub').addEventListener('change', e => {
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  // In den Jazz Standards nur das Metronom per Taste
+  if (currentView === 'standards' && e.code !== 'KeyM') return;
   if (e.code === 'Space') {
     e.preventDefault();
     document.getElementById('btnPlayPause').click();
@@ -2002,6 +2194,357 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
+// JAZZ STANDARDS
+// ============================================================
+// Neue Standards einfach unten anhängen. Format pro Abschnitt:
+// Takte mit "|" trennen, mehrere Akkorde im Takt mit Leerzeichen.
+// Akkorde in der Originaltonart (Lead-Sheet, Real-Book-übliche Lesart).
+// variant: true = Variante eines A-Teils (klein als Hinweis angezeigt).
+// Stufen werden automatisch relativ zur Grundtonart berechnet.
+const JAZZ_STANDARDS = [
+  { title: "Autumn Leaves", composer: "Joseph Kosma", key: "Gm", form: "AABC", bars: 32,
+    sections: [
+      { label: "A", chords: "Cm7 | F7 | Bbmaj7 | Ebmaj7 | Am7b5 | D7 | Gm | Gm" },
+      { label: "B", chords: "Am7b5 | D7 | Gm | Gm | Cm7 | F7 | Bbmaj7 | Ebmaj7" },
+      { label: "C", chords: "Am7b5 | D7 | Gm7 C7 | Fm7 Bb7 | Ebmaj7 | Am7b5 D7 | Gm | Gm",
+        note: "Takt 3–4 auch chromatisch: Gm7 Gb7 | Fm7 E7" },
+    ],
+    caveat: "Gm = Real-Book-Tonart; gesungen oft in Em. Tonart der französischen Erstfassung unverifiziert." },
+
+  { title: "Blue Bossa", composer: "Kenny Dorham", key: "Cm", form: "AB", bars: 16,
+    sections: [
+      { label: "A", chords: "Cm7 | Cm7 | Fm7 | Fm7 | Dm7b5 | G7 | Cm7 | Cm7" },
+      { label: "B", chords: "Ebm7 | Ab7 | Dbmaj7 | Dbmaj7 | Dm7b5 | G7 | Cm7 | Dm7b5 G7" },
+    ] },
+
+  { title: "All the Things You Are", composer: "Jerome Kern", key: "Ab", form: "AABA", bars: 36,
+    sections: [
+      { label: "A", chords: "Fm7 | Bbm7 | Eb7 | Abmaj7 | Dbmaj7 | Dm7 G7 | Cmaj7 | Cmaj7" },
+      { label: "A2", variant: true, chords: "Cm7 | Fm7 | Bb7 | Ebmaj7 | Abmaj7 | Am7 D7 | Gmaj7 | Gmaj7",
+        note: "Zweites A: eine Quinte tiefer, landet in G" },
+      { label: "B", chords: "Am7 | D7 | Gmaj7 | Gmaj7 | F#m7 | B7 | Emaj7 | C7#5" },
+      { label: "A3", variant: true, chords: "Fm7 | Bbm7 | Eb7 | Abmaj7 | Dbmaj7 | Dbm7 | Cm7 | Bdim7 | Bbm7 | Eb7 | Abmaj7 | Gm7b5 C7",
+        note: "Letztes A auf 12 Takte erweitert" },
+    ],
+    caveat: "Moduliert stark (Ab, C, Eb, G, E): Stufen beziehen sich immer auf Ab." },
+
+  { title: "Fly Me to the Moon", composer: "Bart Howard", key: "C", form: "ABAC", bars: 32,
+    sections: [
+      { label: "A", chords: "Am7 | Dm7 | G7 | Cmaj7 | Fmaj7 | Bm7b5 | E7 | Am7 A7" },
+      { label: "B", chords: "Dm7 | G7 | Cmaj7 | Am7 | Dm7 | G7 | Cmaj7 | Bm7b5 E7" },
+      { label: "C", chords: "Dm7 | G7 | Em7 | A7 | Dm7 | G7 | C6 | Bm7b5 E7" },
+    ],
+    caveat: "C = gängige Lead-Sheet-Tonart; Tonart der Erstfassung (1954, „In Other Words“) unverifiziert." },
+
+  { title: "Take the A Train", composer: "Billy Strayhorn", key: "C", form: "AABA", bars: 32,
+    sections: [
+      { label: "A", chords: "C6 | C6 | D7b5 | D7b5 | Dm7 | G7 | C6 | Dm7 G7",
+        note: "A2 endet auf C6 | C6 (in die Bridge)" },
+      { label: "B", chords: "Fmaj7 | Fmaj7 | Fmaj7 | Fmaj7 | D7 | D7 | Dm7 | G7" },
+    ] },
+
+  { title: "Satin Doll", composer: "Duke Ellington / Billy Strayhorn", key: "C", form: "AABA", bars: 32,
+    sections: [
+      { label: "A", chords: "Dm7 G7 | Dm7 G7 | Em7 A7 | Em7 A7 | Am7 D7 | Abm7 Db7 | C6 | C6" },
+      { label: "B", chords: "Gm7 C7 | Gm7 C7 | Fmaj7 | Fmaj7 | Am7 D7 | Am7 D7 | Dm7 | G7" },
+    ],
+    caveat: "Schlusstakte des A-Teils je nach Quelle mit Turnaround (z. B. Em7 A7)." },
+
+  { title: "There Will Never Be Another You", composer: "Harry Warren", key: "Eb", form: "ABAC", bars: 32,
+    sections: [
+      { label: "A", chords: "Ebmaj7 | Ebmaj7 | Dm7b5 | G7 | Cm7 | Cm7 | Bbm7 | Eb7" },
+      { label: "B", chords: "Abmaj7 | Db7 | Ebmaj7 | Cm7 | F7 | F7 | Fm7 | Bb7" },
+      { label: "C", chords: "Abmaj7 | Db7 | Ebmaj7 | Cm7 | Fm7 | Bb7 | Ebmaj7 | Fm7 Bb7" },
+    ],
+    caveat: "B- und C-Teil kursieren in mehreren Lesarten (z. B. Abm7 Db7 statt Db7) – bei Bedarf gegen das Real Book prüfen." },
+
+  { title: "Summertime", composer: "George Gershwin", key: "Dm", form: "AB", bars: 16,
+    sections: [
+      { label: "A", chords: "Dm6 | Em7b5 A7 | Dm6 | Dm6 | Gm7 | Gm7 | Em7b5 | A7" },
+      { label: "B", chords: "Dm6 | Em7b5 A7 | Dm6 | D7 | Gm7 C7 | Fmaj7 Bb7 | Em7b5 A7 | Dm6" },
+    ],
+    caveat: "Viele Lesarten im Umlauf (einfacher: Dm | A7 …). Dm = gängige Lead-Sheet-Tonart; Tonart der Oper unverifiziert." },
+
+  { title: "Misty", composer: "Erroll Garner", key: "Eb", form: "AABA", bars: 32,
+    sections: [
+      { label: "A", chords: "Ebmaj7 | Bbm7 Eb7 | Abmaj7 | Abm7 Db7 | Ebmaj7 Cm7 | Fm7 Bb7 | Gm7 C7 | Fm7 Bb7",
+        note: "A2 endet: Eb6 | Bbm7 Eb7 (in die Bridge)" },
+      { label: "B", chords: "Bbm7 | Eb7 | Abmaj7 | Abmaj7 | Am7 | D7 | Gm7 C7 | Fm7 Bb7" },
+    ] },
+
+  { title: "Solar", composer: "Miles Davis", key: "Cm", form: "A (12 Takte, einteilig)", bars: 12,
+    sections: [
+      { label: "A", chords: "CmMaj7 | CmMaj7 | Gm7 | C7 | Fmaj7 | Fmaj7 | Fm7 | Bb7 | Ebmaj7 | Ebm7 Ab7 | Dbmaj7 | Dm7b5 G7" },
+    ],
+    caveat: "Urheberschaft umstritten (Chuck Wayne, „Sonny“)." },
+];
+
+// "Cm7 | F7 | Dm7b5 G7" → [["Cm7"], ["F7"], ["Dm7b5", "G7"]]
+function parseBars(str) {
+  return String(str).split('|')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(s => s.split(/\s+/));
+}
+
+// Grundton und Moll/Dur aus "Gm", "Ab", "F#m"
+function parseSongKey(key) {
+  const m = String(key).match(/^([A-G][#b]?)(m?)$/);
+  if (!m) return null;
+  return { root: m[1], semi: NOTE_TO_SEMI[m[1]], minor: m[2] === 'm' };
+}
+
+// b-Schreibweise bevorzugen? Dur: C und b-Tonarten; Moll: Tonarten mit b-Vorzeichen
+function keyPrefersFlats(root, minor) {
+  return minor
+    ? ["C", "D", "F", "G", "Bb", "Eb", "Ab"].includes(root)
+    : ["C", "F", "Bb", "Eb", "Ab", "Db", "Gb"].includes(root);
+}
+
+// Mögliche Zieltonarten (Grundton) für die Transpositions-Pills
+const STD_ROOTS_MAJOR = ["C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
+const STD_ROOTS_MINOR = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B"];
+
+const STD_DEGREES = ["I", "bII", "II", "bIII", "III", "IV", "#IV", "V", "bVI", "VI", "bVII", "VII"];
+
+// Stufe eines Akkords relativ zum Grundton der Tonart, z. B. Dm7 in C → "ii7".
+// Schreibweise wie in PROGRESSIONS (ii7, V7, Imaj7, iiø, vii°7), damit
+// classifyFunction die Funktionsfarbe bestimmen kann.
+function standardRoman(chord, tonicSemi) {
+  const main = String(chord).split('/')[0];
+  const m = main.match(/^([A-G][#b]?)(.*)$/);
+  if (!m || NOTE_TO_SEMI[m[1]] === undefined) return '';
+  const deg = STD_DEGREES[(NOTE_TO_SEMI[m[1]] - tonicSemi + 12) % 12];
+  const q = m[2];
+  const lower = deg.replace(/[IV]+/, r => r.toLowerCase());
+  if (/^(m7b5|ø)/.test(q)) return lower + 'ø';
+  if (/^(dim|°)/.test(q)) return lower + (q.includes('7') ? '°7' : '°');
+  if (/^m(?!aj)/.test(q)) {
+    if (/maj/i.test(q)) return lower + 'maj7';
+    if (/^m6/.test(q)) return lower + '6';
+    return lower + (/^m(7|9|11|13)/.test(q) ? '7' : '');
+  }
+  if (/^(maj|Δ)/.test(q)) return deg + 'maj7';
+  if (/^6/.test(q)) return deg + '6';
+  if (/sus/.test(q)) return deg + '7sus';
+  if (/^(7|9|11|13)/.test(q)) return deg + '7';
+  if (/^(aug|\+)/.test(q)) return deg + '+';
+  return deg;
+}
+
+// Grundton per Buchstaben-Abstand umschreiben (Ab→C: Dm7 → F#m7, nicht Gbm7).
+// Doppelvorzeichen vermeiden: dann normale Halbton-Schreibweise.
+const STD_LETTERS = "CDEFGAB";
+const STD_LETTER_SEMIS = [0, 2, 4, 5, 7, 9, 11];
+function spellStandardRoot(root, interval, letterShift, flats) {
+  const li = STD_LETTERS.indexOf(root[0]);
+  const target = (NOTE_TO_SEMI[root] + interval) % 12;
+  const nli = (li + letterShift) % 7;
+  const acc = ((target - STD_LETTER_SEMIS[nli] + 18) % 12) - 6;
+  if (acc === 0) return STD_LETTERS[nli];
+  if (acc === 1) return STD_LETTERS[nli] + '#';
+  if (acc === -1) return STD_LETTERS[nli] + 'b';
+  return transposeChord(root, interval, flats);
+}
+function transposeStandardChord(chord, interval, letterShift, flats) {
+  return chord.split('/').map(part => {
+    const m = part.match(/^([A-G][#b]?)(.*)$/);
+    return m ? spellStandardRoot(m[1], interval, letterShift, flats) + m[2] : part;
+  }).join('/');
+}
+
+// Song in Zieltonart (Grundton) aufbereiten: Abschnitte als Takt-Arrays
+// mit Akkord + Stufe. targetRoot leer/gleich Original → keine Umschreibung.
+function transposeStandard(song, targetRoot) {
+  const k = parseSongKey(song.key);
+  const root = targetRoot && NOTE_TO_SEMI[targetRoot] !== undefined ? targetRoot : k.root;
+  const interval = (NOTE_TO_SEMI[root] - k.semi + 12) % 12;
+  const flats = keyPrefersFlats(root, k.minor);
+  const letterShift = (STD_LETTERS.indexOf(root[0]) - STD_LETTERS.indexOf(k.root[0]) + 7) % 7;
+  return {
+    ...song,
+    key: root + (k.minor ? 'm' : ''),
+    sections: song.sections.map(sec => ({
+      ...sec,
+      bars: parseBars(sec.chords).map(bar => bar.map(c => {
+        const chord = interval === 0 ? c : transposeStandardChord(c, interval, letterShift, flats);
+        return { chord, roman: standardRoman(c, k.semi) };
+      })),
+    })),
+  };
+}
+
+// ---------- Setlist (localStorage, Titel als Schlüssel) ----------
+let setlist = [];
+function loadSetlist() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('chordtrainer_setlist') || '[]');
+    const known = new Set(JAZZ_STANDARDS.map(s => s.title));
+    setlist = Array.isArray(stored) ? stored.filter(t => known.has(t)) : [];
+  } catch (e) { setlist = []; }
+}
+function saveSetlist() {
+  try {
+    localStorage.setItem('chordtrainer_setlist', JSON.stringify(setlist));
+  } catch (e) { /* ignore */ }
+}
+function setlistAdd(title) {
+  if (!setlist.includes(title)) { setlist.push(title); saveSetlist(); }
+}
+function setlistRemove(title) {
+  setlist = setlist.filter(t => t !== title);
+  saveSetlist();
+}
+function setlistMove(title, dir) {
+  const i = setlist.indexOf(title);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= setlist.length) return;
+  [setlist[i], setlist[j]] = [setlist[j], setlist[i]];
+  saveSetlist();
+}
+
+// ---------- Ansicht ----------
+let currentView = 'trainer';
+let pausedByView = false;
+let stdCurrent = JAZZ_STANDARDS[0].title;
+let stdTargetRoot = '';      // '' = Originaltonart
+let stdShowRoman = true;
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function stdSong() {
+  return JAZZ_STANDARDS.find(s => s.title === stdCurrent) || JAZZ_STANDARDS[0];
+}
+
+function selectStandard(title) {
+  stdCurrent = title;
+  stdTargetRoot = '';
+  renderStandards();
+}
+
+// Tonart-Pills (nur bei Songwechsel neu bauen; buildPills setzt den aktiven Pill selbst)
+function renderStdKeyPills() {
+  const k = parseSongKey(stdSong().key);
+  const roots = k.minor ? STD_ROOTS_MINOR : STD_ROOTS_MAJOR;
+  const pillItems = ['original', ...roots.map(r => r + (k.minor ? 'm' : ''))];
+  buildPills('stdKeys', pillItems,
+    () => (stdTargetRoot && stdTargetRoot !== k.root) ? stdTargetRoot + (k.minor ? 'm' : '') : 'original',
+    item => {
+      stdTargetRoot = item === 'original' ? '' : item.replace(/m$/, '');
+      renderStdSong();
+    });
+}
+
+function renderStdList(containerId, titles, withControls) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  if (withControls && titles.length === 0) {
+    c.innerHTML = '<div class="history-empty">Noch leer – „+ Setlist“ beim Song</div>';
+    return;
+  }
+  titles.forEach((title, idx) => {
+    const song = JAZZ_STANDARDS.find(s => s.title === title);
+    const btn = document.createElement('button');
+    btn.className = 'history-item std-item' + (title === stdCurrent ? ' active' : '');
+    btn.innerHTML = `
+      <span class="history-item-name">${withControls ? (idx + 1) + '. ' : ''}${escapeHTML(title)}</span>
+      <span class="history-item-key">${escapeHTML(song.key)} · ${escapeHTML(song.form)}</span>`;
+    btn.addEventListener('click', () => selectStandard(title));
+    if (!withControls) { c.appendChild(btn); return; }
+    const row = document.createElement('div');
+    row.className = 'std-set-row';
+    row.appendChild(btn);
+    [['↑', 'Nach oben', () => setlistMove(title, -1)],
+     ['↓', 'Nach unten', () => setlistMove(title, 1)],
+     ['✕', 'Aus Setlist entfernen', () => setlistRemove(title)]].forEach(([label, tip, fn]) => {
+      const b = document.createElement('button');
+      b.className = 'std-mini';
+      b.textContent = label;
+      b.title = tip;
+      b.setAttribute('aria-label', tip + ': ' + title);
+      b.addEventListener('click', () => { fn(); renderStandards(); });
+      row.appendChild(b);
+    });
+    c.appendChild(row);
+  });
+}
+
+function renderStandards() {
+  renderStdList('stdList', JAZZ_STANDARDS.map(s => s.title), false);
+  renderStdList('stdSetlist', setlist, true);
+  renderStdKeyPills();
+  renderStdSong();
+}
+
+function renderStdSong() {
+  const song = stdSong();
+  const shown = transposeStandard(song, stdTargetRoot);
+
+  document.getElementById('stdTitle').textContent = song.title;
+  const inSet = setlist.includes(song.title);
+  const setBtn = document.getElementById('btnStdSetlist');
+  setBtn.textContent = inSet ? '✓ In Setlist' : '+ Setlist';
+  setBtn.title = inSet ? 'Aus der Setlist entfernen' : 'In die Setlist übernehmen';
+
+  const transposed = shown.key !== song.key;
+  document.getElementById('stdMeta').innerHTML =
+    `${escapeHTML(song.composer)} · Form <strong>${escapeHTML(song.form)}</strong> · ${song.bars} Takte`
+    + ` · Originaltonart <strong>${escapeHTML(song.key)}</strong>`
+    + (transposed ? ` · gespielt in <strong>${escapeHTML(shown.key)}</strong>` : '');
+
+  document.getElementById('stdSections').innerHTML = shown.sections.map(sec => `
+    <div class="std-section${sec.variant ? ' variant' : ''}">
+      <div class="std-section-label">${escapeHTML(sec.label)}<span>${sec.bars.length} Takte${sec.variant ? ' · Variante' : ''}</span></div>
+      <div class="std-bars">${sec.bars.map(bar => `
+        <div class="std-bar">${bar.map(({ chord, roman }) => `
+          <div class="std-chord">
+            <div class="chord func-${classifyFunction(roman)}">${formatChord(escapeHTML(chord))}</div>
+            ${stdShowRoman ? `<div class="chord-roman">${escapeHTML(roman)}</div>` : ''}
+          </div>`).join('')}
+        </div>`).join('')}
+      </div>
+      ${sec.note ? `<div class="std-note">${escapeHTML(sec.note)}</div>` : ''}
+    </div>`).join('');
+
+  document.getElementById('stdCaveat').innerHTML =
+    (song.caveat ? `<strong>Hinweis:</strong> ${escapeHTML(song.caveat)}<br>` : '')
+    + 'Stufen relativ zur Grundtonart, Modulationen werden nicht umgedeutet. Farben wie im Trainer (Tonika / Subdominante / Dominante / chromatisch).';
+}
+
+function setView(view) {
+  currentView = view;
+  const std = view === 'standards';
+  document.body.classList.toggle('view-standards', std);
+  document.getElementById('tabTrainer').classList.toggle('active', !std);
+  document.getElementById('tabStandards').classList.toggle('active', std);
+  document.getElementById('tabTrainer').setAttribute('aria-pressed', String(!std));
+  document.getElementById('tabStandards').setAttribute('aria-pressed', String(std));
+  // Countdown im Trainer anhalten, solange die Standards offen sind
+  if (std && !isPaused) {
+    document.getElementById('btnPlayPause').click();
+    pausedByView = true;
+  } else if (!std && pausedByView) {
+    if (isPaused) document.getElementById('btnPlayPause').click();
+    pausedByView = false;
+  }
+  if (std) renderStandards();
+}
+
+document.getElementById('tabTrainer').addEventListener('click', () => setView('trainer'));
+document.getElementById('tabStandards').addEventListener('click', () => setView('standards'));
+document.getElementById('btnStdSetlist').addEventListener('click', () => {
+  const title = stdSong().title;
+  if (setlist.includes(title)) setlistRemove(title); else setlistAdd(title);
+  renderStandards();
+});
+document.getElementById('stdRoman').addEventListener('change', e => {
+  stdShowRoman = e.target.checked;
+  renderStdSong();
+});
+
+// ============================================================
 // FILTER PILLS
 // ============================================================
 function buildPills(containerId, items, getActive, onSelect) {
@@ -2029,6 +2572,7 @@ buildPills('keyFilter', KEYS, () => activeKey, k => { activeKey = k; });
 // ============================================================
 loadFavorites();
 loadHard();
+loadSetlist();
 loadStats();
 loadMetro();
 updateMetroUI();

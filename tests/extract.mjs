@@ -33,6 +33,10 @@ const EXPORT_NAMES = [
   // Metronom (reine Helfer + Laden/Speichern)
   'clampBpm', 'normalizeSubdiv', 'metroStepSec', 'metroIsBeat',
   'loadMetro', 'saveMetro', 'METRO_MIN', 'METRO_MAX', 'METRO_DEFAULT',
+  // Jazz Standards
+  'JAZZ_STANDARDS', 'parseBars', 'parseSongKey', 'keyPrefersFlats', 'standardRoman',
+  'transposeStandard', 'loadSetlist', 'saveSetlist', 'setlistAdd', 'setlistRemove',
+  'setlistMove', 'escapeHTML', 'renderStandards', 'setView',
 ];
 
 export function readHtml() {
