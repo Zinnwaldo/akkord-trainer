@@ -212,16 +212,17 @@ test('stotco: nur Setliste „Song-Sammler“, ergänzt vorhandene Songs, Neue i
   assert.equal(r.source, 'setlist');
   assert.equal(r.total, 3);
   assert.equal(r.added, 1);
-  assert.equal(r.updated, 2);
+  assert.equal(r.updated, 0);                             // beide haben schon Struktur und Tonart aus dem Seed
+  assert.equal(r.unchanged, 2);
   assert.deepEqual([...r.byTitle], ["You've Got a Friend in Me"]);
   assert.equal(st.songs.length, n0 + 1);
   const friend = st.songs.find(s => s.id === 'seed-friend-in-me');
   assert.equal(friend.artist, 'Randy Newman');          // Interpret bleibt
   assert.equal(friend.key, 'Eb');
-  assert.equal(friend.sections.length, 1);
+  assert.equal(friend.sections.length, SONG_SEED.find(x => x.id === 'seed-friend-in-me').sections.length); // Struktur aus dem Seed bleibt
   const lemon = st.songs.find(s => s.id === 'seed-lemon-tree');
   assert.equal(lemon.listId, ueben.id);                   // Liste bleibt
-  assert.equal(lemon.key, 'Am');
+  assert.equal(lemon.key, 'Fm');                         // Seed-Tonart wird nicht überschrieben
   const ww = st.songs.find(s => s.title === 'Wonderwall');
   assert.equal(st.lists.find(l => l.id === ww.listId).name, 'Neu gehört');
   assert.ok(!st.songs.some(s => s.title === 'Nicht in der Setliste'));
@@ -242,11 +243,17 @@ test('stotco: ohne Setliste alle Songs; eigene Struktur wird nicht überschriebe
   assert.equal(r.source, 'all');
   assert.equal(r.total, 4);
   assert.equal(lemon.sections[0].name, 'Eigene');
-  assert.equal(lemon.stotcoId, 's2');
-  // ab jetzt gilt stotco als Quelle für diesen Song
+  assert.equal(lemon.stotcoId, undefined);               // nicht verknüpft
   const d2 = STOTCO(); d2.songs[1].abschnitte = [{ name: 'Neu', takte: [['Am']] }];
   SONGS.mergeImport(st, d2);
-  assert.equal(lemon.sections[0].name, 'Neu');
+  assert.equal(lemon.sections[0].name, 'Eigene');        // auch beim zweiten Import nicht
+  // Song ohne Struktur: übernimmt stotco und folgt späteren Importen
+  const ho = st.songs.find(s => s.id === 'seed-ho-hey');
+  ho.sections = [];
+  SONGS.mergeImport(st, { songs: [{ id: 'h', titel: 'Ho Hey', kuenstler: 'The Lumineers', originalTonart: 'C', abschnitte: [{ name: 'A', takte: [['C']] }] }] });
+  assert.equal(ho.stotcoId, 'h');
+  SONGS.mergeImport(st, { songs: [{ id: 'h', titel: 'Ho Hey', kuenstler: 'The Lumineers', originalTonart: 'C', abschnitte: [{ name: 'B', takte: [['F']] }] }] });
+  assert.equal(ho.sections[0].name, 'B');
 });
 
 test('stotco: Titel-Abgleich nur bei Eindeutigkeit', () => {
@@ -254,7 +261,90 @@ test('stotco: Titel-Abgleich nur bei Eindeutigkeit', () => {
   st.songs.push(SONGS.cleanSong({ id: 'sing2', title: 'Sing', artist: 'Ed Sheeran', listId: st.lists[0].id }));
   const r = SONGS.mergeImport(st, { songs: [{ id: 'q', titel: 'Sing', kuenstler: 'travis ', originalTonart: 'F#m', abschnitte: [] }] });
   assert.equal(r.added, 0);                                  // Travis exakt (Groß/Klein, Leerzeichen egal)
-  assert.equal(st.songs.find(s => s.id === 'seed-sing-travis').stotcoId, 'q');
+  assert.equal(r.unchanged, 1);                              // dem Seed-Song zugeordnet, nichts neu
   const r2 = SONGS.mergeImport(st, { songs: [{ id: 'q2', titel: 'Sing', kuenstler: 'Pentatonix', abschnitte: [] }] });
   assert.equal(r2.added, 1);                                 // zwei Kandidaten → lieber neu
+});
+
+// ---------- Seed v2: sieben Songs mit Struktur, Nachreichen in alte Speicherstände ----------
+
+test('SONG_SEED v2: sieben Songs mit Struktur, Tonart, Lemon Tree Refrain in Ab', () => {
+  assert.equal(SONG_SEED.length, 7);
+  for (const s of SONG_SEED) {
+    assert.equal(s.v, 2, s.id);
+    assert.ok(X.parseSongKey(s.key), s.id);
+    assert.ok(s.sections.length >= 4, s.id);
+    assert.ok(SONGS.songShown(SONGS.cleanSong(s)), s.id);
+  }
+  const lemon = SONG_SEED.find(s => s.id === 'seed-lemon-tree');
+  assert.equal(lemon.key, 'Fm');
+  assert.equal(lemon.sections.find(x => x.name === 'Refrain').key, 'Ab');
+  const ref = SONGS.songShown(SONGS.cleanSong(lemon)).sections.find(x => x.label === 'Refrain');
+  assert.equal(ref.bars[0][0].local, 'I');
+});
+
+// Speicherstand wie ihn 54713f0 hinterlassen hat: Seed-Songs ohne Struktur, kein seedApplied
+function oldSaved(patch = {}) {
+  const lists = [{ id: 'l1', name: 'Neu gehört' }, { id: 'l2', name: 'Am Üben' }];
+  const songs = SONG_SEED.map(s => ({ id: s.id, listId: 'l1', title: s.title, artist: s.artist, key: '', chords: '', note: '', instrument: 'beides', updated: 0 }));
+  for (const [id, p] of Object.entries(patch)) Object.assign(songs.find(s => s.id === id), p);
+  return { lists, songs, seeded: SONG_SEED.map(s => s.id), active: 'l1' };
+}
+
+test('Seed v2 kommt in alte Speicherstände: leere Felder werden gefüllt', () => {
+  const st = SONGS.normalizeState(oldSaved());
+  assert.equal(st.songs.length, 7);
+  for (const s of SONG_SEED) {
+    const mine = st.songs.find(x => x.id === s.id);
+    assert.equal(mine.key, s.key, s.id);
+    assert.equal(mine.sections.length, s.sections.length, s.id);
+    assert.equal(mine.note, s.note, s.id);
+    assert.equal(mine.listId, 'l1');
+    assert.equal(st.seedApplied[s.id].v, 2);
+  }
+});
+
+test('Seed v2 überschreibt nichts Eigenes; Liste, Instrument, Löschung bleiben', () => {
+  const saved = oldSaved({
+    'seed-ho-hey': { key: 'D', note: 'meine Notiz', listId: 'l2', instrument: 'gitarre' },
+    'seed-crazy-gnarls': { chords: 'Cm Eb Ab G', sections: [{ name: 'Eigen', chords: 'Cm | G' }] },
+  });
+  saved.songs = saved.songs.filter(s => s.id !== 'seed-hotel-california');   // gelöscht
+  const st = SONGS.normalizeState(saved);
+  const ho = st.songs.find(s => s.id === 'seed-ho-hey');
+  assert.equal(ho.key, 'D');
+  assert.equal(ho.note, 'meine Notiz');
+  assert.equal(ho.listId, 'l2');
+  assert.equal(ho.instrument, 'gitarre');
+  assert.ok(ho.sections.length > 0);                         // leere Struktur wurde gefüllt
+  const crazy = st.songs.find(s => s.id === 'seed-crazy-gnarls');
+  assert.equal(crazy.sections[0].name, 'Eigen');
+  assert.equal(crazy.chords, 'Cm Eb Ab G');
+  assert.equal(crazy.key, 'Cm');
+  assert.ok(!st.songs.some(s => s.id === 'seed-hotel-california'));
+});
+
+test('Seed-Upgrade: einmalig, später geänderte Seed-Werte ersetzen nur unveränderte Felder', () => {
+  const st = SONGS.normalizeState(oldSaved());
+  const saved = JSON.parse(JSON.stringify(st));
+  const ho = saved.songs.find(s => s.id === 'seed-ho-hey');
+  ho.note = 'von Karsten';
+  const t0 = saved.songs.find(s => s.id === 'seed-sing-travis').updated;
+  // gleiche Version: nichts passiert
+  const again = SONGS.normalizeState(JSON.parse(JSON.stringify(saved)));
+  assert.equal(again.songs.find(s => s.id === 'seed-ho-hey').note, 'von Karsten');
+  assert.equal(again.songs.find(s => s.id === 'seed-sing-travis').updated, t0);
+  // gedachte Seed-v3 mit neuer Notiz und Tonart
+  const v3 = SONG_SEED.map(s => ({ ...s, v: 3, note: s.note + ' (v3)' }));
+  const up = SONGS.applySeed(JSON.parse(JSON.stringify(again)), v3);
+  assert.equal(up.songs.find(s => s.id === 'seed-ho-hey').note, 'von Karsten');
+  assert.match(up.songs.find(s => s.id === 'seed-sing-travis').note, /\(v3\)$/);
+});
+
+test('App-Start mit altem Speicherstand: Nachträge landen in localStorage', () => {
+  const app = loadApp({ localStorageData: { chordtrainer_songs: JSON.stringify(oldSaved()) } });
+  assert.deepEqual(app.errors, []);
+  const stored = JSON.parse(app.localStorage.getItem('chordtrainer_songs'));
+  assert.equal(stored.songs.find(s => s.id === 'seed-lemon-tree').key, 'Fm');
+  assert.equal(stored.seedApplied['seed-lemon-tree'].v, 2);
 });

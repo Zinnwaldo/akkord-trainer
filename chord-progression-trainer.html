@@ -3563,14 +3563,86 @@ return { render, stop };
 // chords (Freitext), note, instrument ('klavier' | 'gitarre' | 'beides'),
 // optional sections: [{ name: 'Strophe', chords: 'Am F | C G', key: '' }]
 // (key je Abschnitt nur, wenn er von der Songtonart abweicht).
+// v = Seed-Version. Wird sie erhöht, kommen key, chords, note und sections
+// beim nächsten Laden auch in schon gespeicherte Seed-Songs, aber nur in
+// Felder, die dort leer sind oder noch den alten Seed-Wert haben
+// (Eigenes bleibt). Stand v2: Struktur aus stotco sheets (Setliste
+// „Song-Sammler“, Export 24.10.), Lemon Tree Refrain/Outro in As-Dur.
 const SONG_SEED = [
-  { id: 'seed-save-tonight', list: 'Neu gehört', title: 'Save Tonight', artist: 'Eagle-Eye Cherry', key: '', chords: '', note: '', instrument: 'beides' },
-  { id: 'seed-lemon-tree', list: 'Neu gehört', title: 'Lemon Tree', artist: "Fool's Garden", key: '', chords: '', note: '', instrument: 'beides' },
-  { id: 'seed-sing-travis', list: 'Neu gehört', title: 'Sing', artist: 'Travis', key: '', chords: '', note: '', instrument: 'beides' },
-  { id: 'seed-ho-hey', list: 'Neu gehört', title: 'Ho Hey', artist: 'The Lumineers', key: '', chords: '', note: '', instrument: 'beides' },
-  { id: 'seed-crazy-gnarls', list: 'Neu gehört', title: 'Crazy', artist: 'Gnarls Barkley', key: '', chords: '', note: '', instrument: 'beides' },
-  { id: 'seed-friend-in-me', list: 'Neu gehört', title: "You've Got a Friend in Me", artist: 'Randy Newman', key: '', chords: '', note: '', instrument: 'beides' },
-  { id: 'seed-hotel-california', list: 'Neu gehört', title: 'Hotel California', artist: 'Eagles', key: '', chords: '', note: '', instrument: 'beides' },
+  { id: 'seed-save-tonight', v: 2, list: 'Neu gehört', title: "Save Tonight", artist: "Eagle-Eye Cherry", key: 'Am', chords: '', instrument: 'beides',
+    note: "Korrigiert nach UG-Import: Wiederholungen „x2“ (Intro) und „x4“ (Solo, Outro) ausgeschrieben, der Parser hatte sie verworfen.",
+    sections: [
+    { name: "Intro", chords: "Am F | C G | Am F | C G | Am | F | C | G | Am | F | C | G" },
+    { name: "Strophe 1", chords: "Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | C" },
+    { name: "Refrain", chords: "G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G" },
+    { name: "Solo", chords: "Am F | C G | Am F | C G | Am F | C G | Am F | C G" },
+    { name: "Strophe 3", chords: "Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | C" },
+    { name: "Refrain 2", chords: "G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G" },
+    { name: "Outro", chords: "Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am F | C G | Am F | C G | Am F | C G | Am F | C G | Am | F | C | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G" },
+  ] },
+  { id: 'seed-lemon-tree', v: 2, list: 'Neu gehört', title: "Lemon Tree", artist: "Fool's Garden", key: 'Fm', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 8. Bund, Griffe in Am/C. Akkorde hier klingend umgerechnet (+8 Halbtöne). Laut UG ist die Aufnahme etwas zu hoch gestimmt. Korrigiert: Griffbild-Legende „[Chords]“ (F#dim7, G) als Abschnitt entfernt; Tonart war fälschlich F# (vom ersten Legenden-Akkord abgeleitet).",
+    sections: [
+    { name: "Intro", chords: "Fm | Cm | Fm | Cm | Bbm | Cm | Fm | Cm | Fm" },
+    { name: "Strophe 1", chords: "Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Bbm | Cm | Fm | Cm | Fm" },
+    { name: "Refrain", key: 'Ab', chords: "Ab | Eb | Eb | Eb | Fm | Cm | Cm | Cm | Db | Eb | Ab | Eb7 | Ab | Eb | Eb | Eb | Fm | Cm | Cm | Cm | Db | Ddim7 | Eb | Eb7" },
+    { name: "Zwischenspiel", chords: "Fm | Fm | Cm | Cm | Fm | Fm | Cm | Cm | Bbm | Bbm | Cm | Cm | Fm | Cm | Fm" },
+    { name: "Bridge", chords: "C | Fm | Fm | Fm | Eb | Ab | C | C" },
+    { name: "Strophe 4", chords: "Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Bbm | Cm | Fm | Cm | Fm" },
+    { name: "Outro", key: 'Ab', chords: "Ab | Eb | Eb | Eb | Fm | Cm | Cm | Cm | Db | Eb | Db | Eb | Db | Eb | Ab | Ab" },
+  ] },
+  { id: 'seed-sing-travis', v: 2, list: 'Neu gehört', title: "Sing", artist: "Travis", key: 'F#m', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 2. Bund, Griffe in Em/G. Akkorde hier klingend umgerechnet (+2 Halbtöne). Intro: jeder Akkord etwa 8 Anschläge (Picking-Muster). Korrigiert: Intro-Wiederholung x2 ausgeschrieben; Spielhinweis aus dem Intro-Text in die Notizen verschoben; Refrain-Raster nach dem Instrumentalteil der Vorlage gesetzt (Parser hatte G doppelt und Takte verschoben).",
+    sections: [
+    { name: "Intro", chords: "F#m | Bm | F#m | F#m | Bm | F#m" },
+    { name: "Strophe 1", chords: "F#m | Bm7 | Bm7 | Bm7 | Bm7 | F#m | F#m | F#m | F#m | Bm7 | Bm7 | Bm7 | Bm7 | F#m | F#m | F#m" },
+    { name: "Refrain", chords: "A E | Bm | Bm | A | A E | Bm | Bm | A" },
+    { name: "Instrumental", chords: "A E | Bm | Bm | A | A E | Bm | Bm | A" },
+    { name: "Strophe 3", chords: "F#m | Bm7 | Bm7 | Bm7 | F#m | Bm7 | Bm7 | Bm7 | F#m | F#m | F#m | F#m" },
+    { name: "Refrain 2", chords: "A E | Bm | Bm | A | A E | Bm | Bm | A | A E | Bm | Bm | A | A E | Bm | Bm | A" },
+  ] },
+  { id: 'seed-ho-hey', v: 2, list: 'Neu gehört', title: "Ho Hey", artist: "The Lumineers", key: 'C', chords: '', instrument: 'beides',
+    note: "Korrigiert: Tonart war fälschlich F (vom ersten Intro-Akkord abgeleitet), richtig C.",
+    sections: [
+    { name: "Intro", chords: "F | C | C | C | F | C | C | C | F | C | C | C | F | C | C | C | F | F | F | F" },
+    { name: "Strophe 1", chords: "C | F | C | C | C | F | C | C | C | F | C | C | C | C | C | C | Am | G | F | C | F | C | C | C | F | C | C | C" },
+    { name: "Strophe 2", chords: "C | F | C | C | C | F | C | C | C | F | C | C | C | C | C | C | Am | G | F | C" },
+    { name: "Refrain", chords: "Am | G | C | C | Am | G | G | G | F | C | C | C | F | C | C | C | F | C | C | C | F | C | C | C | F | F | F | F" },
+    { name: "Strophe 3", chords: "C | F | C | C | C | F | C | C | C | F | C | C | C | Am | G | F | C | Am | G | F | C" },
+    { name: "Refrain 2", chords: "Am | G | C | C | Am | G | C | C" },
+    { name: "Bridge", chords: "F | C | G | C | F | C | Gsus | G | F | C | G | C" },
+    { name: "Refrain 3", chords: "Am | G | C | C | Am | G | G | G | F | C | C | C" },
+    { name: "Outro", chords: "F | C | C | C | F | C | C | C | F | C | C | C" },
+  ] },
+  { id: 'seed-crazy-gnarls', v: 2, list: 'Neu gehört', title: "Crazy", artist: "Gnarls Barkley", key: 'Cm', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 3. Bund, Griffe in Am. Akkorde hier klingend umgerechnet (+3 Halbtöne). Offen: UG schreibt am Anfang von Strophe 2/3 und im Outro C-Dur (Griff A) statt Cm, Tippfehler oder Absicht unklar.",
+    sections: [
+    { name: "Strophe 1", chords: "Cm | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ab | Ab | Ab | Ab | Gsus4 | G | G | G | Cm | Cm | Cm | Cm | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
+    { name: "Refrain", chords: "Cm | Cm | Cm | Cm | Eb | Eb | Eb | Eb | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
+    { name: "Strophe 2", chords: "C | Ab | Ab | Ab | Ebmaj7 | Gsus4 | G | G | Cm | Eb | Eb | Eb | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
+    { name: "Refrain 2", chords: "Cm | Cm | Cm | Cm | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
+    { name: "Outro", chords: "C | Ab | Ebmaj7 | Gsus4 | G | Cm" },
+  ] },
+  { id: 'seed-friend-in-me', v: 2, list: 'Neu gehört', title: "You've Got a Friend in Me", artist: "Randy Newman", key: 'Eb', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 3. Bund, Griffe in C (Key: Eb). Akkorde hier klingend umgerechnet (+3 Halbtöne). Swing. Korrigiert: Griffbild-Liste „Special Chords“ als Abschnitt entfernt; in Zeilen mit Taktstrichen (z. B. „D7 G | C E7 | …“) hatte der Parser die Akkorde vor dem ersten Strich verworfen, D7 G am Ende von Strophe 1, 2, 3 und der Schlussakkord nachgetragen. Offen: Strophen-Takt 2 Bbaug (UG) vs. Bb7 (zweite UG-Version); vorletzte Kadenz F7 vs. Fm7.",
+    sections: [
+    { name: "Intro", chords: "Eb G7 | Cm B7 | Eb Bb | Eb Bbaug | Eb9 Bbaug" },
+    { name: "Strophe 1", chords: "Eb | Bbaug | Eb | Eb7 | Ab | Adim7 | Eb | Eb7 | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | F7 | Bb | Eb | C7 | F7 | Bb | Eb G7 | Cm B7 | Eb Bb" },
+    { name: "Strophe 2", chords: "Eb | Bbaug | Eb | Eb7 | Ab | Adim7 | Eb | Eb7 | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | F7 | Bb | Eb | C7 | F7 | Bb | Eb Eb7" },
+    { name: "Bridge", chords: "Ab | D | D | D | Eb | D7 | Eb | Eb | D | D7 | D7 | D7 | Gm | C7 | C7 | C7 | Fm | Bb | Bb | Bb" },
+    { name: "Strophe 3", chords: "Eb | Bbaug | Eb | Eb7 | Ab | Adim7 | Eb | Eb7 | Ab | Adim7 | Eb | G7 | Cm | F7 | Bb | Eb | C7 | F7 | Bb | Eb | C7 | F7 | Bb | Eb G7 | Cm B7 | Eb Bb | Eb" },
+  ] },
+  { id: 'seed-hotel-california', v: 2, list: 'Neu gehört', title: "Hotel California", artist: "Eagles", key: 'Bm', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 2. Bund, Griffe in Am. Akkorde hier klingend umgerechnet (+2 Halbtöne). Korrigiert: Wiederholungen x2 (Intro), x3 (Outro Solo), x2 (Harmonies, Fade-out) ausgeschrieben.",
+    sections: [
+    { name: "Intro", chords: "Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7 | A | E | G | D | Em | F#7" },
+    { name: "Strophe", chords: "Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7 | Bm | F#7 | F#7 | F#7 | A | A | A | A | E | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7" },
+    { name: "Refrain", chords: "G | D | D | D | F#7 | Bm | Bm | Bm | G | D | D | D | Em | F#7 | F#7 | F#7" },
+    { name: "Strophe 2", chords: "Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | F#7 | F#7 | F#7 | Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7" },
+    { name: "Strophe 3", chords: "Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7 | Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7" },
+    { name: "Outro Solo", chords: "Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7 | A | E | G | D | Em | F#7" },
+    { name: "Harmonies", chords: "Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7 | A | E | G | D | Em | F#7" },
+  ] },
 ];
 
 const SONGS = (() => {
@@ -3640,21 +3712,57 @@ function cleanSong(s, fallbackList) {
   };
 }
 
-// Seed-Songs einfügen, die noch nicht übernommen wurden
+// Seed-Felder, die per Seed-Version nachgereicht werden (als Vergleichswerte)
+const SEED_FIELDS = ['key', 'chords', 'note', 'sections'];
+function seedValues(s) {
+  const c = cleanSong({ ...s, listId: 'x' }) || {};
+  return { key: c.key || '', chords: c.chords || '', note: c.note || '', sections: JSON.stringify(c.sections || []) };
+}
+const fieldValue = (song, f) => f === 'sections' ? JSON.stringify(song.sections || []) : String(song[f] || '');
+
+// Gespeicherten Seed-Song auf neue Seed-Version heben. Ein Feld wird nur
+// gesetzt, wenn es leer ist oder noch dem zuletzt übernommenen Seed-Wert
+// entspricht. Vor v2 gab es keine Aufzeichnung: damals waren alle Felder leer.
+function upgradeSeed(st, s) {
+  const v = Number(s.v) || 1;
+  const prev = st.seedApplied[s.id] || { v: 1, key: '', chords: '', note: '', sections: '[]' };
+  if (prev.v >= v) return;
+  const next = seedValues(s);
+  const song = st.songs.find(x => x.id === s.id);
+  if (song) {
+    let changed = false;
+    for (const f of SEED_FIELDS) {
+      const cur = fieldValue(song, f);
+      const empty = f === 'sections' ? cur === '[]' : !cur.trim();
+      if ((empty || cur === prev[f]) && cur !== next[f]) {
+        song[f] = f === 'sections' ? JSON.parse(next[f]) : next[f];
+        changed = true;
+      }
+    }
+    if (changed) song.updated = Date.now();
+  }
+  st.seedApplied[s.id] = { v, ...next };
+}
+
+// Seed-Songs einfügen, die noch nicht übernommen wurden; übernommene auf
+// neue Seed-Version heben (gelöschte bleiben gelöscht)
 function applySeed(st, seed = SONG_SEED) {
+  if (!st.seedApplied || typeof st.seedApplied !== 'object') st.seedApplied = {};
   for (const s of seed) {
-    if (!s || !s.id || st.seeded.includes(s.id)) continue;
+    if (!s || !s.id) continue;
+    if (st.seeded.includes(s.id)) { upgradeSeed(st, s); continue; }
     let list = st.lists.find(l => l.name === s.list);
     if (!list) { list = { id: uid('l'), name: s.list || DEFAULT_LISTS[0] }; st.lists.push(list); }
     const song = cleanSong({ ...s, listId: list.id });
     if (song && !st.songs.some(x => x.id === song.id)) st.songs.push(song);
     st.seeded.push(s.id);
+    st.seedApplied[s.id] = { v: Number(s.v) || 1, ...seedValues(s) };
   }
   return st;
 }
 
 function freshState() {
-  return { lists: DEFAULT_LISTS.map(name => ({ id: uid('l'), name })), songs: [], seeded: [], active: '' };
+  return { lists: DEFAULT_LISTS.map(name => ({ id: uid('l'), name })), songs: [], seeded: [], seedApplied: {}, active: '' };
 }
 
 function normalizeState(raw) {
@@ -3664,6 +3772,7 @@ function normalizeState(raw) {
     if (!st.lists.length) st.lists = freshState().lists;
     st.songs = (Array.isArray(raw.songs) ? raw.songs : []).map(s => cleanSong(s)).filter(Boolean);
     st.seeded = Array.isArray(raw.seeded) ? raw.seeded.map(String) : [];
+    if (raw.seedApplied && typeof raw.seedApplied === 'object' && !Array.isArray(raw.seedApplied)) st.seedApplied = raw.seedApplied;
     st.active = String(raw.active || '');
   }
   // Songs ohne gültige Liste landen in der ersten Liste
@@ -3808,13 +3917,17 @@ function mergeStotco(st, data) {
     }
     // Ergänzen: Struktur und Tonart aus stotco, wenn hier leer oder schon
     // von stotco stammend; Interpret und Notiz nur, wenn hier leer.
+    // Abgleich im 1. Durchgang trotzdem über die id, falls verknüpft.
     const fromStotco = !!inc.stotcoId && mine.stotcoId === inc.stotcoId;
     const before = JSON.stringify(mine);
-    if (inc.sections.length && (fromStotco || !mine.sections.length)) mine.sections = inc.sections;
+    // Verknüpft (stotcoId) wird nur, wessen Struktur aus stotco kommt; eigene
+    // oder Seed-Struktur bleibt so auch bei späteren Importen unangetastet.
+    const takeSections = inc.sections.length && (fromStotco || !mine.sections.length);
+    if (takeSections) mine.sections = inc.sections;
     if (inc.key && (fromStotco || !mine.key)) mine.key = inc.key;
     if (!mine.artist && inc.artist) mine.artist = inc.artist;
     if (!mine.note.trim() && inc.note) mine.note = inc.note;
-    if (inc.stotcoId) mine.stotcoId = inc.stotcoId;
+    if (inc.stotcoId && takeSections) mine.stotcoId = inc.stotcoId;
     if (JSON.stringify(mine) !== before) { mine.updated = Date.now(); res.updated++; } else res.unchanged++;
   }
   return res;
@@ -3879,6 +3992,7 @@ function nashvilleText(text, key) {
 
 // ---------- UI ----------
 let state = loadState();
+save();   // Seed-Nachträge sofort sichern
 let editId = null;          // null = kein Formular, '' = neuer Song
 let viewId = null;          // Song in der Ansicht (Harmonie-Wege), null = Liste
 const HW = { roman: true, arrows: true, colors: false, sound: true };
