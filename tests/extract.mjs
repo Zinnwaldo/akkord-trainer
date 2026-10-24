@@ -39,6 +39,8 @@ const EXPORT_NAMES = [
   'setlistMove', 'escapeHTML', 'renderStandards', 'setView',
   // Harmonie-Wege (Standards-Darstellung)
   'stdHwRelation', 'stdHwSegments', 'stdHwRelKey',
+  // Songs (Song-Sammler)
+  'SONG_SEED', 'SONGS',
 ];
 
 export function readHtml() {
