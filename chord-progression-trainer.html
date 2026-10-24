@@ -1161,6 +1161,23 @@
   .sg-view .sg-form-actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .sg-view .sg-form-actions button { padding: 7px 14px; font-size: 13px; }
   .sg-view .sg-status { font-size: 12px; color: var(--accent-hover); min-height: 1em; }
+  .sg-view textarea#sgStruct { font-family: 'JetBrains Mono', monospace; font-size: 13px; min-height: 110px; }
+  .sg-view .sg-struct { font-size: 13px; color: var(--text-secondary); overflow-wrap: anywhere; }
+  /* Song-Ansicht mit Struktur: nutzt die Harmonie-Wege (hw-) der Jazz Standards */
+  .sg-view .sg-detail { display: none; min-width: 0; overflow-y: auto; min-height: 0; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px; }
+  .sg-view.viewing .sg-detail { display: block; }
+  .sg-view.viewing .sg-songs { display: none; }
+  .sg-view .sg-detail-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 6px; }
+  .sg-view .sg-detail-head .sg-title { font-size: 24px; }
+  .sg-view .sg-detail-head button { padding: 5px 10px; font-size: 12px; }
+  .sg-view .sg-detail-head .sg-detail-btns { display: flex; gap: 6px; margin-left: auto; }
+  .sg-view .sg-detail .std-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 10px 0; }
+  .sg-view .sg-detail .sg-meta { margin-bottom: 4px; }
+  .sg-hw .hw-sec { grid-template-columns: minmax(0, 1fr); }
+  .sg-hw .hw-sec-label { padding-top: 0; margin-bottom: 2px; font-family: inherit; font-size: 13px; }
+  .sg-hw .hw-note { grid-column: 1; }
+  .sg-hw .sg-plain { font-family: 'JetBrains Mono', monospace; font-size: 14px; overflow-wrap: anywhere; }
+  .sg-view .sg-detail-foot { font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-top: 8px; line-height: 1.5; }
 
   @media (max-width: 880px) {
     .sg-view.editing .sg-main { grid-template-columns: minmax(0, 1fr); }
@@ -1168,11 +1185,14 @@
     .sg-view .sg-songs { overflow: visible; }
     body.view-songs .sg-view { overflow-y: auto; }
     .sg-view .sg-main { flex: none; }
+    .sg-view .sg-detail { overflow: visible; }
   }
   @media (max-width: 640px) {
     .sg-view .sg-actions { margin-left: 0; width: 100%; }
     .sg-view .sg-actions button { flex: 1; justify-content: center; }
     .sg-view .sg-songs { grid-template-columns: minmax(0, 1fr); }
+    .sg-view .sg-detail { padding: 12px 10px; }
+    .sg-view .sg-detail-head .sg-detail-btns { margin-left: 0; width: 100%; }
     .sg-view .sg-form select, .sg-view .sg-form input[type="text"], .sg-view .sg-form textarea { font-size: 16px; }
   }
 </style>
@@ -1187,7 +1207,7 @@
     <button class="view-tab active" id="tabTrainer" aria-pressed="true">Trainer</button>
     <button class="view-tab" id="tabStandards" aria-pressed="false">Jazz Standards</button>
     <button class="view-tab" id="tabBlues" aria-pressed="false">Blues</button>
-    <button class="view-tab" id="tabSongs" aria-pressed="false">Songs</button>
+    <button class="view-tab" id="tabSongs" aria-pressed="false">Song-Sammler</button>
   </nav>
   <div class="header" id="header">
     <div class="progression-name" id="progName">—</div>
@@ -1330,19 +1350,39 @@
       <div class="sg-actions">
         <button type="button" class="primary" id="sgSongAdd">+ Song</button>
         <button type="button" id="sgExport" title="Alle Listen und Songs als JSON-Datei sichern">Export</button>
-        <button type="button" id="sgImport" title="JSON-Datei einlesen und mit den vorhandenen Songs zusammenführen">Import</button>
+        <button type="button" id="sgImport" title="JSON-Datei einlesen (eigener Export oder Export aus stotco sheets) und mit den vorhandenen Songs zusammenführen">Import</button>
         <input type="file" id="sgImportFile" accept="application/json,.json" hidden>
       </div>
     </div>
     <div class="sg-status" id="sgStatus" role="status"></div>
     <div class="sg-main">
       <div class="sg-songs" id="sgSongs"></div>
+      <div class="sg-detail" id="sgDetail">
+        <div class="sg-detail-head">
+          <div class="sg-title" id="sgDetailTitle"></div>
+          <div class="sg-artist" id="sgDetailArtist"></div>
+          <div class="sg-detail-btns">
+            <button type="button" id="sgDetailBack">← Liste</button>
+            <button type="button" id="sgDetailEdit">Bearbeiten</button>
+          </div>
+        </div>
+        <div class="sg-meta" id="sgDetailMeta"></div>
+        <div class="std-tools">
+          <label class="toggle"><input type="checkbox" id="sgHwRoman" checked><span>Stufen</span></label>
+          <label class="toggle"><input type="checkbox" id="sgHwArrows" checked><span>Pfeile</span></label>
+          <label class="toggle"><input type="checkbox" id="sgHwColors"><span title="Funktionsfarben, bezogen auf das Tonzentrum">Farben</span></label>
+          <label class="toggle"><input type="checkbox" id="sgHwSound" checked><span title="Akkord beim Antippen anspielen">Ton</span></label>
+        </div>
+        <div class="hw-legend" id="sgLegend" aria-label="Zeichen"></div>
+        <div class="sg-hw" id="sgSections"></div>
+        <div class="sg-detail-foot" id="sgDetailFoot"></div>
+      </div>
       <form class="sg-form" id="sgForm" autocomplete="off">
         <h3 id="sgFormTitle">Neuer Song</h3>
         <label class="sg-field">Titel<input type="text" id="sgTitle" required></label>
         <label class="sg-field">Interpret<input type="text" id="sgArtist"></label>
         <div class="sg-row">
-          <label class="sg-field">Tonart<select id="sgKey"></select></label>
+          <label class="sg-field">Tonart (klingend)<select id="sgKey"></select></label>
           <label class="sg-field">Instrument<select id="sgInstrument">
             <option value="beides">Klavier + Gitarre</option>
             <option value="klavier">Klavier</option>
@@ -1350,8 +1390,10 @@
           </select></label>
         </div>
         <label class="sg-field">Liste<select id="sgList"></select></label>
-        <label class="sg-field">Akkorde / Stufen<textarea id="sgChords" rows="3" placeholder="z. B. C G Am F | C G F C"></textarea></label>
+        <label class="sg-field">Akkorde (Freitext)<textarea id="sgChords" rows="3" placeholder="z. B. C G Am F | C G F C"></textarea></label>
         <div class="sg-hint">Akkorde mit Leerzeichen trennen, „|“ als Taktstrich, H geht auch für B. Mit Tonart erscheinen die Stufen als Nashville-Zahlen.</div>
+        <label class="sg-field">Struktur (optional)<textarea id="sgStruct" rows="5" placeholder="Intro: Am F | C G&#10;Strophe: Am F | C G&#10;Refrain [Ab]: Ab | Eb | Fm | Cm"></textarea></label>
+        <div class="sg-hint">Eine Zeile pro Abschnitt: „Name: Akkorde“, Takte mit „|“. Abweichende Tonart in eckigen Klammern hinter dem Namen, z. B. „Refrain [Ab]:“ oder „[Fm]“. „%“ wiederholt den Takt davor. Mit Struktur und Tonart gibt es die Ansicht mit Stufen und Pfeilen.</div>
         <label class="sg-field">Notiz<textarea id="sgNote" rows="3"></textarea></label>
         <div class="sg-form-actions">
           <button type="submit" class="primary" id="sgSave">Speichern</button>
@@ -3517,8 +3559,10 @@ return { render, stop };
 // wird jeder Seed-Song, dessen id noch nicht übernommen wurde, in seine
 // Liste (Feld list = Listenname) eingefügt — auch bei schon gespeicherten
 // Daten. Gelöschte Seed-Songs kommen nicht wieder (ids in state.seeded).
-// Felder: id, list, title, artist, key ('' oder z. B. 'G', 'Am'),
-// chords (Freitext), note, instrument ('klavier' | 'gitarre' | 'beides').
+// Felder: id, list, title, artist, key (klingende Tonart, '' oder z. B. 'G', 'Am'),
+// chords (Freitext), note, instrument ('klavier' | 'gitarre' | 'beides'),
+// optional sections: [{ name: 'Strophe', chords: 'Am F | C G', key: '' }]
+// (key je Abschnitt nur, wenn er von der Songtonart abweicht).
 const SONG_SEED = [
   { id: 'seed-save-tonight', list: 'Neu gehört', title: 'Save Tonight', artist: 'Eagle-Eye Cherry', key: '', chords: '', note: '', instrument: 'beides' },
   { id: 'seed-lemon-tree', list: 'Neu gehört', title: 'Lemon Tree', artist: "Fool's Garden", key: '', chords: '', note: '', instrument: 'beides' },
@@ -3540,20 +3584,59 @@ const NASH = ['1', 'b2', '2', 'b3', '3', '4', '#4', '5', 'b6', '6', 'b7', '7'];
 let uidN = 0;
 const uid = p => p + '-' + Date.now().toString(36) + '-' + (uidN++).toString(36) + Math.random().toString(36).slice(2, 6);
 
+// Akkordtext vereinheitlichen: H → B (deutsche Schreibweise), Leerraum glätten
+function normChords(text) {
+  return String(text || '').replace(/(^|[\s|/])H(?=[#b]?(?:[^A-Za-z]|m|maj|dim|aug|sus|add|$))/g, '$1B')
+    .replace(/[ \t]+/g, ' ').trim();
+}
+function cleanKey(k) {
+  const key = String(k || '').trim().replace(/^H/, 'B').replace(/min$/, 'm');
+  return parseSongKey(key) ? key : '';
+}
+function cleanSections(arr) {
+  if (!Array.isArray(arr)) return [];
+  return arr.filter(x => x && typeof x === 'object').map(x => ({
+    name: String(x.name || x.label || '').trim() || 'Teil',
+    chords: normChords(x.chords),
+    key: cleanKey(x.key),
+  })).filter(x => x.chords.replace(/[|\s]/g, ''));
+}
+
+// Struktur als Text (Formular): eine Zeile pro Abschnitt, „Name [Tonart]: Akkorde“.
+// Zeilen ohne Doppelpunkt hängen am vorigen Abschnitt.
+function parseStructure(text) {
+  const out = [];
+  for (const line of String(text || '').split(/\r?\n/)) {
+    const t = line.trim();
+    if (!t) continue;
+    const m = t.match(/^([^:|\[]+?)\s*(?:\[\s*([A-H][#b]?(?:m|min)?)\s*\])?\s*:\s*(.*)$/);
+    if (m) out.push({ name: m[1].trim(), key: m[2] || '', chords: m[3] });
+    else if (out.length) out[out.length - 1].chords += ' | ' + t;
+    else out.push({ name: 'Teil', key: '', chords: t });
+  }
+  return cleanSections(out);
+}
+function structureText(sections) {
+  return (sections || []).map(x => `${x.name}${x.key ? ` [${x.key}]` : ''}: ${x.chords}`).join('\n');
+}
+
 function cleanSong(s, fallbackList) {
   if (!s || typeof s !== 'object') return null;
   const title = String(s.title || s.titel || '').trim();
   if (!title) return null;
+  const sections = cleanSections(s.sections);
   return {
     id: String(s.id || uid('s')),
     listId: String(s.listId || fallbackList || ''),
     title,
     artist: String(s.artist || s.kuenstler || '').trim(),
-    key: parseSongKey(String(s.key || '')) ? String(s.key) : '',
+    key: cleanKey(s.key),
     chords: String(s.chords || ''),
+    sections,
     note: String(s.note || s.notizen || ''),
     instrument: INSTRUMENTS[s.instrument] ? s.instrument : 'beides',
     updated: Number(s.updated) || 0,
+    ...(s.stotcoId ? { stotcoId: String(s.stotcoId) } : {}),
   };
 }
 
@@ -3602,6 +3685,7 @@ function save() {
 // Import zusammenführen: Listen über id oder Namen, Songs über id
 // (neuere Änderung gewinnt). Löschungen wandern nicht mit.
 function mergeImport(st, data) {
+  if (isStotcoExport(data)) return mergeStotco(st, data);
   const inLists = Array.isArray(data) ? [] : (Array.isArray(data && data.lists) ? data.lists : []);
   const inSongs = Array.isArray(data) ? data : (Array.isArray(data && data.songs) ? data.songs : null);
   if (!inSongs) throw new Error('Keine Songs in der Datei');
@@ -3628,6 +3712,138 @@ function mergeImport(st, data) {
   }
   if (Array.isArray(data && data.seeded)) for (const id of data.seeded) if (!st.seeded.includes(id)) st.seeded.push(String(id));
   return { added, updated };
+}
+
+// ---------- Import aus stotco sheets ----------
+// Format: { songs: [{ id, titel, kuenstler, originalTonart, transposeOffset,
+//   abschnitte: [{ name, takte: [['Am','F'], ['%'], ...] }], notizen }],
+//   setlisten: [{ name, eintraege: [{ songId, offsetOverride? }] }] }
+// Gibt es eine Setliste „Song-Sammler“, kommen nur deren Songs, sonst alle.
+// Akkorde und originalTonart in stotco gelten als klingend und werden 1:1
+// übernommen ('%' = Takt gehalten, 'N.C.' = Pause). transposeOffset (Spieltonart
+// in stotco) ändert nichts, steht nur in der Notiz. Ein „Capo N“ in den Notizen
+// wird nicht umgerechnet, sondern als Prüfhinweis vermerkt.
+const STOTCO_SETLIST = 'song-sammler';
+const NEW_LIST = 'Neu gehört';
+
+function isStotcoExport(data) {
+  return !!(data && !Array.isArray(data) && data.format !== 'akkord-trainer-songs' && Array.isArray(data.songs)
+    && data.songs.some(s => s && (Array.isArray(s.abschnitte) || 'titel' in s)));
+}
+
+const normTitle = t => String(t || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[’‘`´]/g, "'").replace(/^(the|die|der|das)\s+/, '').replace(/[^a-z0-9']+/g, ' ').trim();
+
+function shiftKey(key, semis) {
+  const k = parseSongKey(key);
+  if (!k || !semis) return key;
+  const semi = (k.semi + semis + 120) % 12;
+  const root = (k.minor ? KEY_ROOTS_MINOR : KEY_ROOTS)[semi];
+  return root + (k.minor ? 'm' : '');
+}
+
+function stotcoSong(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const title = String(raw.titel || raw.title || '').trim();
+  if (!title) return null;
+  const notes = String(raw.notizen || '');
+  const capo = /\bcapo\s*\d/i.test(notes);
+  const key = cleanKey(raw.originalTonart);
+  const sections = (Array.isArray(raw.abschnitte) ? raw.abschnitte : []).map(a => {
+    let prev = '';
+    const bars = (Array.isArray(a && a.takte) ? a.takte : []).map(bar => (Array.isArray(bar) ? bar : [bar]).map(c => {
+      c = String(c || '').trim();
+      if (c === '%' || c === '') return prev;
+      prev = c;
+      return c;
+    }).filter(Boolean).join(' ')).filter(Boolean);
+    return { name: a && a.name, chords: bars.join(' | ') };
+  });
+  const off = ((Number(raw.transposeOffset) || 0) % 12 + 12) % 12;
+  const extra = [];
+  if (capo) extra.push('Capo-Hinweis aus stotco: prüfen, ob die Akkorde klingend sind.');
+  if (off && key) extra.push(`In stotco transponiert auf ${shiftKey(key, off)}.`);
+  return {
+    title, artist: String(raw.kuenstler || raw.artist || '').trim(), key,
+    sections: cleanSections(sections),
+    note: [notes.trim().replace(/([^.!?])$/, '$1.'), ...extra].filter(Boolean).join(' '),
+    stotcoId: String(raw.id || ''),
+  };
+}
+
+function mergeStotco(st, data) {
+  const sl = (Array.isArray(data.setlisten) ? data.setlisten : [])
+    .find(x => x && String(x.name || '').trim().toLowerCase() === STOTCO_SETLIST);
+  let raws = data.songs;
+  if (sl) {
+    const byId = new Map(data.songs.filter(Boolean).map(x => [x.id, x]));
+    raws = (Array.isArray(sl.eintraege) ? sl.eintraege : []).map(e => byId.get(e && e.songId)).filter(Boolean);
+  }
+  const incoming = raws.map(stotcoSong).filter(Boolean);
+  const res = { added: 0, updated: 0, unchanged: 0, byTitle: [], source: sl ? 'setlist' : 'all', total: incoming.length, stotco: true };
+  const claimed = new Set();
+  // 1. Durchgang: frühere stotco-Übernahme oder Titel + Interpret gleich
+  const match = new Map();
+  for (const inc of incoming) {
+    const m = st.songs.find(x => !claimed.has(x) && inc.stotcoId && x.stotcoId === inc.stotcoId)
+      || st.songs.find(x => !claimed.has(x) && normTitle(x.title) === normTitle(inc.title) && normTitle(x.artist) === normTitle(inc.artist));
+    if (m) { match.set(inc, m); claimed.add(m); }
+  }
+  // 2. Durchgang: Interpret anders geschrieben → nur über den Titel, wenn eindeutig
+  for (const inc of incoming) {
+    if (match.has(inc)) continue;
+    const t = normTitle(inc.title);
+    const cands = st.songs.filter(x => !claimed.has(x) && normTitle(x.title) === t);
+    const rivals = incoming.filter(x => !match.has(x) && normTitle(x.title) === t);
+    if (cands.length === 1 && rivals.length === 1) { match.set(inc, cands[0]); claimed.add(cands[0]); res.byTitle.push(inc.title); }
+  }
+  let list = st.lists.find(l => l.name === NEW_LIST);
+  for (const inc of incoming) {
+    const mine = match.get(inc);
+    if (!mine) {
+      if (!list) { list = { id: uid('l'), name: NEW_LIST }; st.lists.push(list); }
+      st.songs.push(cleanSong({ ...inc, id: uid('s'), listId: list.id, instrument: 'beides', updated: Date.now() }));
+      res.added++;
+      continue;
+    }
+    // Ergänzen: Struktur und Tonart aus stotco, wenn hier leer oder schon
+    // von stotco stammend; Interpret und Notiz nur, wenn hier leer.
+    const fromStotco = !!inc.stotcoId && mine.stotcoId === inc.stotcoId;
+    const before = JSON.stringify(mine);
+    if (inc.sections.length && (fromStotco || !mine.sections.length)) mine.sections = inc.sections;
+    if (inc.key && (fromStotco || !mine.key)) mine.key = inc.key;
+    if (!mine.artist && inc.artist) mine.artist = inc.artist;
+    if (!mine.note.trim() && inc.note) mine.note = inc.note;
+    if (inc.stotcoId) mine.stotcoId = inc.stotcoId;
+    if (JSON.stringify(mine) !== before) { mine.updated = Date.now(); res.updated++; } else res.unchanged++;
+  }
+  return res;
+}
+
+// ---------- Harmonie-Wege für Songs mit Struktur ----------
+// Baut aus den Abschnitten die Darstellung der Jazz Standards
+// (transposeStandard + stdHwSectionsHTML). Tonzentrum je Abschnitt:
+// eigene Tonart des Abschnitts, sonst die Songtonart.
+// '%' wiederholt den Takt davor, Nicht-Akkorde (x4, Klammern) fallen weg.
+const CHORD_TOKEN_RE = /^(?:N\.C\.|[A-G][#b]?[^\s/]*(?:\/[A-G][#b]?)?)$/;
+function cleanBarsText(chords) {
+  let prev = '';
+  return normChords(chords).split('|').map(bar => {
+    const toks = bar.trim().split(/\s+/).filter(Boolean)
+      .map(t => t.replace(/^\((?!.*\))/, '').replace(/^([^(]*)\)[,.;:]*$/, '$1'));
+    if (toks.length === 1 && toks[0] === '%') return prev;
+    const ok = toks.filter(t => CHORD_TOKEN_RE.test(t) && (t === 'N.C.' || nashvilleChord(t, 0) !== null));
+    if (ok.length) prev = ok.join(' ');
+    return ok.join(' ');
+  }).filter(Boolean).join(' | ');
+}
+function songShown(s) {
+  const home = s.key || (s.sections.find(x => x.key) || {}).key || '';
+  if (!parseSongKey(home)) return null;
+  const sections = s.sections.map(x => ({ label: x.name, chords: cleanBarsText(x.chords), centers: [[x.key || home, Infinity]], ownKey: x.key }))
+    .filter(x => x.chords);
+  if (!sections.length) return null;
+  return transposeStandard({ key: home, sections }, '');
 }
 
 // ---------- Nashville-Zahlen ----------
@@ -3664,14 +3880,16 @@ function nashvilleText(text, key) {
 // ---------- UI ----------
 let state = loadState();
 let editId = null;          // null = kein Formular, '' = neuer Song
+let viewId = null;          // Song in der Ansicht (Harmonie-Wege), null = Liste
+const HW = { roman: true, arrows: true, colors: false, sound: true };
 const $ = id => document.getElementById(id);
 const view = $('songsView');
 const listName = id => (state.lists.find(l => l.id === id) || {}).name || '';
 let statusTimer = null;
-function status(msg) {
+function status(msg, ms = 4000) {
   $('sgStatus').textContent = msg;
   clearTimeout(statusTimer);
-  statusTimer = setTimeout(() => { $('sgStatus').textContent = ''; }, 4000);
+  statusTimer = setTimeout(() => { $('sgStatus').textContent = ''; }, ms);
 }
 
 function renderLists() {
@@ -3693,10 +3911,12 @@ function songCard(s) {
   return `<article class="sg-card${s.id === editId ? ' sel' : ''}">
     <div><div class="sg-title">${escapeHTML(s.title)}</div>${s.artist ? `<div class="sg-artist">${escapeHTML(s.artist)}</div>` : ''}</div>
     <div class="sg-meta">${s.key ? `<span class="sg-chip key">${escapeHTML(s.key)}</span>` : ''}<span class="sg-chip">${INSTRUMENTS[s.instrument]}</span></div>
+    ${s.sections.length ? `<div><span class="sg-label">Struktur</span><div class="sg-struct">${s.sections.map(x => escapeHTML(x.name)).join(' · ')}</div></div>` : ''}
     ${s.chords.trim() ? `<div><span class="sg-label">Akkorde</span><div class="sg-chords">${escapeHTML(s.chords)}</div></div>` : ''}
     ${nash ? `<div><span class="sg-label">Stufen (Nashville)</span><div class="sg-nash">${escapeHTML(nash)}</div></div>` : ''}
     ${s.note.trim() ? `<div class="sg-note">${escapeHTML(s.note)}</div>` : ''}
     <div class="sg-card-actions">
+      ${s.sections.length ? `<button type="button" class="primary" data-view="${escapeHTML(s.id)}">Ansehen</button>` : ''}
       <button type="button" data-edit="${escapeHTML(s.id)}">Bearbeiten</button>
       ${move}
       <button type="button" data-del="${escapeHTML(s.id)}">Löschen</button>
@@ -3711,10 +3931,43 @@ function renderSongs() {
     : `<div class="sg-empty">Noch keine Songs in „${escapeHTML(listName(state.active))}“. Mit „+ Song“ eintragen.</div>`;
 }
 
+function renderDetail() {
+  const s = viewId && state.songs.find(x => x.id === viewId);
+  if (!s) { viewId = null; return; }
+  $('sgDetailTitle').textContent = s.title;
+  $('sgDetailArtist').textContent = s.artist;
+  const own = [...new Set(s.sections.filter(x => x.key && x.key !== s.key).map(x => x.key))];
+  $('sgDetailMeta').innerHTML = (s.key ? `<span class="sg-chip key">${escapeHTML(s.key)}</span>` : '<span class="sg-chip ex">Tonart offen</span>')
+    + own.map(k => `<span class="sg-chip key">${escapeHTML(k)}</span>`).join('')
+    + `<span class="sg-chip">${s.sections.length} Abschnitt${s.sections.length === 1 ? '' : 'e'}</span>`
+    + `<span class="sg-chip">${INSTRUMENTS[s.instrument]}</span>`;
+  const shown = songShown(s);
+  const el = $('sgSections');
+  if (shown) {
+    el.innerHTML = stdHwSectionsHTML(shown);
+  } else {
+    el.innerHTML = s.sections.map(x => `<div class="hw-sec"><div class="hw-sec-label">${escapeHTML(x.name)}</div><div class="sg-plain">${escapeHTML(x.chords)}</div></div>`).join('');
+  }
+  el.classList.toggle('hw-arrows', HW.arrows);
+  el.classList.toggle('hw-colors', HW.colors);
+  el.classList.toggle('hw-no-roman', !HW.roman);
+  $('sgDetailFoot').innerHTML = shown
+    ? 'Stufen beziehen sich auf das Tonzentrum über der Gruppe: die Songtonart oder die eigene Tonart des Abschnitts („→“ = wird angesteuert, Tonika kommt dort nicht). '
+      + 'Die kleine Stufe neben dem Zentrum zeigt dessen Lage in der Songtonart. Pfeile und Klammern werden aus Grundton-Abstand und Akkordtyp berechnet.'
+      + (s.note.trim() ? `<br><strong>Notiz:</strong> ${escapeHTML(s.note)}` : '')
+    : 'Tonart eintragen („Bearbeiten“), dann erscheinen Stufen, Tonzentren und Pfeile.';
+}
+
 function render() {
   renderLists();
-  renderSongs();
+  if (viewId && !state.songs.some(x => x.id === viewId)) viewId = null;
+  view.classList.toggle('viewing', !!viewId && editId === null);
+  if (viewId && editId === null) renderDetail(); else renderSongs();
   view.classList.toggle('editing', editId !== null);
+}
+function openDetail(id) {
+  viewId = id; editId = null; render();
+  try { view.scrollIntoView({ block: 'start' }); } catch (e) { /* egal */ }
 }
 
 function fillSelects(song) {
@@ -3723,6 +3976,10 @@ function fillSelects(song) {
     '<optgroup label="Moll">' + KEY_ROOTS_MINOR.map(r => `<option value="${r}m">${r}m</option>`).join('') + '</optgroup>'];
   $('sgKey').innerHTML = keyOpts.join('');
   $('sgList').innerHTML = state.lists.map(l => `<option value="${escapeHTML(l.id)}">${escapeHTML(l.name)}</option>`).join('');
+  // Tonart aus Import, die nicht in der Auswahl steht (z. B. Gb), trotzdem anbieten
+  if (song.key && !KEY_ROOTS.concat(KEY_ROOTS_MINOR.map(r => r + 'm')).includes(song.key)) {
+    $('sgKey').insertAdjacentHTML('beforeend', `<option value="${escapeHTML(song.key)}">${escapeHTML(song.key)}</option>`);
+  }
   $('sgKey').value = song.key || '';
   $('sgList').value = song.listId || state.active;
 }
@@ -3730,10 +3987,11 @@ function fillSelects(song) {
 function openForm(id) {
   const song = id ? state.songs.find(s => s.id === id) : null;
   editId = song ? song.id : '';
-  const s = song || { title: '', artist: '', key: '', chords: '', note: '', instrument: 'beides', listId: state.active };
+  const s = song || { title: '', artist: '', key: '', chords: '', sections: [], note: '', instrument: 'beides', listId: state.active };
   $('sgFormTitle').textContent = song ? 'Song bearbeiten' : 'Neuer Song';
   $('sgTitle').value = s.title; $('sgArtist').value = s.artist;
   $('sgChords').value = s.chords; $('sgNote').value = s.note;
+  $('sgStruct').value = structureText(s.sections);
   $('sgInstrument').value = s.instrument;
   fillSelects(s);
   render();
@@ -3747,11 +4005,12 @@ $('sgForm').addEventListener('submit', e => {
   if (!title) { $('sgTitle').focus(); return; }
   const data = {
     title, artist: $('sgArtist').value.trim(), key: $('sgKey').value,
-    chords: $('sgChords').value, note: $('sgNote').value,
+    chords: $('sgChords').value, note: $('sgNote').value, sections: parseStructure($('sgStruct').value),
     instrument: $('sgInstrument').value, listId: $('sgList').value || state.active, updated: Date.now(),
   };
   if (editId) Object.assign(state.songs.find(s => s.id === editId) || {}, data);
   else state.songs.push(cleanSong({ ...data, id: uid('s') }));
+  if (viewId && viewId !== editId) viewId = null;
   state.active = data.listId;
   save();
   status(`„${title}“ gespeichert.`);
@@ -3763,7 +4022,7 @@ $('sgSongAdd').addEventListener('click', () => openForm(null));
 $('sgListTabs').addEventListener('click', e => {
   const b = e.target.closest('[data-list]');
   if (!b) return;
-  state.active = b.dataset.list; save(); render();
+  state.active = b.dataset.list; viewId = null; save(); render();
 });
 $('sgListAdd').addEventListener('click', () => {
   const name = (prompt('Name der neuen Liste:') || '').trim();
@@ -3791,6 +4050,8 @@ $('sgListDelete').addEventListener('click', () => {
 });
 
 $('sgSongs').addEventListener('click', e => {
+  const vw = e.target.closest('[data-view]');
+  if (vw) { openDetail(vw.dataset.view); return; }
   const ed = e.target.closest('[data-edit]');
   if (ed) { openForm(ed.dataset.edit); return; }
   const del = e.target.closest('[data-del]');
@@ -3812,7 +4073,7 @@ $('sgSongs').addEventListener('change', e => {
 });
 
 $('sgExport').addEventListener('click', () => {
-  const data = { format: 'akkord-trainer-songs', version: 1, exported: new Date().toISOString(), lists: state.lists, songs: state.songs, seeded: state.seeded };
+  const data = { format: 'akkord-trainer-songs', version: 2, exported: new Date().toISOString(), lists: state.lists, songs: state.songs, seeded: state.seeded };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -3830,7 +4091,10 @@ $('sgImportFile').addEventListener('change', e => {
     try {
       const r = mergeImport(state, JSON.parse(reader.result));
       save(); render();
-      status(`Import: ${r.added} neu, ${r.updated} aktualisiert.`);
+      status(r.stotco
+        ? `stotco-Import (${r.source === 'setlist' ? 'Setliste „Song-Sammler“' : 'alle Songs'}, ${r.total}): ${r.added} neu in „${NEW_LIST}“, ${r.updated} ergänzt, ${r.unchanged} unverändert.`
+          + (r.byTitle.length ? ` Nur über den Titel zugeordnet: ${r.byTitle.join(', ')}.` : '')
+        : `Import: ${r.added} neu, ${r.updated} aktualisiert.`, r.stotco ? 15000 : 4000);
     } catch (err) {
       alert('Import fehlgeschlagen: ' + err.message);
     }
@@ -3838,6 +4102,22 @@ $('sgImportFile').addEventListener('change', e => {
   };
   reader.readAsText(file);
 });
+// Song-Ansicht: Zurück, Bearbeiten, Schalter, Ton beim Antippen
+$('sgDetailBack').addEventListener('click', () => { viewId = null; render(); });
+$('sgDetailEdit').addEventListener('click', () => { const id = viewId; openForm(id); viewId = id; });
+[['sgHwRoman', 'roman'], ['sgHwArrows', 'arrows'], ['sgHwColors', 'colors'], ['sgHwSound', 'sound']].forEach(([elId, key]) => {
+  $(elId).addEventListener('change', e => { HW[key] = e.target.checked; if (viewId) renderDetail(); });
+});
+$('sgSections').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.hw-chord');
+  if (!b) return;
+  if (HW.sound) stdHwPlay(b.dataset.chord);
+  $('sgSections').querySelectorAll('.hw-chord.playing').forEach(x => x.classList.remove('playing'));
+  b.classList.add('playing');
+});
+// Legende aus dem Standards-Reiter übernehmen
+{ const lg = document.querySelector('#standardsView .hw-legend'); if (lg) $('sgLegend').innerHTML = lg.innerHTML; }
+
 // Tippen im Formular soll keine Tastenkürzel (z. B. M = Metronom) auslösen
 view.addEventListener('keydown', e => {
   const tag = e.target && e.target.tagName;
@@ -3845,7 +4125,8 @@ view.addEventListener('keydown', e => {
 });
 
 render();
-return { render, nashvilleChord, nashvilleText, normalizeState, mergeImport, applySeed, STORE_KEY };
+return { render, nashvilleChord, nashvilleText, normalizeState, mergeImport, applySeed, STORE_KEY,
+  parseStructure, structureText, stotcoSong, isStotcoExport, songShown, cleanBarsText, cleanSong };
 })();
 
 // ============================================================

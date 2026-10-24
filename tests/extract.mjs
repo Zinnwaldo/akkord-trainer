@@ -38,7 +38,7 @@ const EXPORT_NAMES = [
   'transposeStandard', 'loadSetlist', 'saveSetlist', 'setlistAdd', 'setlistRemove',
   'setlistMove', 'escapeHTML', 'renderStandards', 'setView',
   // Harmonie-Wege (Standards-Darstellung)
-  'stdHwRelation', 'stdHwSegments', 'stdHwRelKey',
+  'stdHwRelation', 'stdHwSegments', 'stdHwRelKey', 'stdHwSectionsHTML',
   // Songs (Song-Sammler)
   'SONG_SEED', 'SONGS',
 ];

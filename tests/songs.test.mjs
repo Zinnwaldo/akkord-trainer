@@ -107,3 +107,154 @@ test('Import: ungültige Tonart und Instrument werden bereinigt', () => {
   assert.equal(z.instrument, 'beides');
   assert.equal(st.lists.find(l => l.id === z.listId).name, 'Kann ich');
 });
+
+// ---------- Struktur, klingende Tonart, stotco-Import, Harmonie-Wege ----------
+
+test('Struktur: Text ↔ Abschnitte, Tonart je Abschnitt, H → B', () => {
+  const secs = SONGS.parseStructure('Intro: Am F | C G\nRefrain [Ab]: Ab | Eb\n  | Fm | Cm\nBridge [Hm]: Hm7 | E7\nLeer:');
+  assert.deepEqual([...secs.map(s => s.name)], ['Intro', 'Refrain', 'Bridge']);
+  assert.equal(secs[1].key, 'Ab');
+  assert.match(secs[1].chords, /Ab \| Eb \| \| Fm \| Cm/);
+  assert.equal(secs[2].key, 'Bm');
+  assert.equal(secs[2].chords, 'Bm7 | E7');
+  assert.equal(SONGS.structureText(secs).split('\n')[1].startsWith('Refrain [Ab]: '), true);
+  assert.equal(JSON.stringify(SONGS.parseStructure(SONGS.structureText(secs))), JSON.stringify(secs));
+});
+
+test('cleanSong: alte Einträge ohne Struktur bleiben gültig, Freitext bleibt', () => {
+  const s = SONGS.cleanSong({ title: 'Alt', chords: 'C G Am F', key: 'C' });
+  assert.deepEqual([...s.sections], []);
+  assert.equal(s.chords, 'C G Am F');
+  const t = SONGS.cleanSong({ title: 'Neu', key: 'Fm', sections: [{ name: 'A', chords: 'Fm | Cm', key: 'quatsch' }, { name: 'B', chords: ' | ' }] });
+  assert.equal(t.sections.length, 1);
+  assert.equal(t.sections[0].key, '');
+});
+
+test('Gespeicherter Stand vom alten Reiter (ohne sections) lädt unverändert', () => {
+  const saved = { lists: [{ id: 'l1', name: 'Neu gehört' }], seeded: SONG_SEED.map(s => s.id), active: 'l1',
+    songs: [{ id: 'x', listId: 'l1', title: 'Alt', chords: 'G D Em C', key: 'G', note: 'n', instrument: 'gitarre', updated: 1 }] };
+  const app = loadApp({ localStorageData: { [SONGS.STORE_KEY]: JSON.stringify(saved) } });
+  assert.equal(SONGS.STORE_KEY, 'chordtrainer_songs');
+  const st = app.exports.SONGS.normalizeState(saved);
+  assert.equal(st.songs[0].chords, 'G D Em C');
+  assert.equal(st.songs[0].sections.length, 0);
+});
+
+test('Ansicht: cleanBarsText wirft Anweisungen raus, % wiederholt', () => {
+  assert.equal(SONGS.cleanBarsText('| Am F | C G | x4'), 'Am F | C G');
+  assert.equal(SONGS.cleanBarsText('| Cm | Eb (bzw. Ebmaj7) | Ab |'), 'Cm | Eb Ebmaj7 | Ab');
+  assert.equal(SONGS.cleanBarsText('C | % | F'), 'C | C | F');
+  assert.equal(SONGS.cleanBarsText('Hm | N.C. | E7'), 'Bm | N.C. | E7');
+});
+
+test('Ansicht: Songtonart als Zentrum, Abschnitt mit eigener Tonart (Lemon Tree)', () => {
+  const song = SONGS.cleanSong({ title: 'Lemon Tree', key: 'Fm', sections: [
+    { name: 'Strophe', chords: 'Fm | Cm | Bbm | Cm' },
+    { name: 'Refrain', key: 'Ab', chords: 'Ab | Eb | Fm | Cm | Db | Eb7' },
+  ] });
+  const shown = SONGS.songShown(song);
+  assert.equal(shown.key, 'Fm');
+  const [str, ref] = shown.sections;
+  assert.equal(str.centers[0].key, 'Fm');
+  assert.deepEqual([...str.bars.flat().map(b => b.local)], ['i', 'v', 'iv', 'v']);
+  assert.equal(ref.centers[0].key, 'Ab');
+  assert.equal(ref.centers[0].rel, 'bIII');
+  assert.deepEqual([...ref.bars.flat().map(b => b.local)], ['I', 'V', 'vi', 'iii', 'IV', 'V7']);
+  // Darstellung der Standards: Etikett, Pfeil, Stufen
+  const html = X.stdHwSectionsHTML ? X.stdHwSectionsHTML(shown) : null;
+  if (html) { assert.match(html, /in Ab/); assert.match(html, /hw-chord/); }
+  // ohne Tonart keine Harmonie-Wege
+  assert.equal(SONGS.songShown({ ...song, key: '', sections: song.sections.map(s => ({ ...s, key: '' })) }), null);
+});
+
+test('Ansicht: Quintfall und II–V werden erkannt (Friend in Me Bridge)', () => {
+  const song = SONGS.cleanSong({ title: 'F', key: 'Eb', sections: [{ name: 'Bridge', chords: 'Gm C7 | Fm Bb7 | Eb' }] });
+  const groups = X.stdHwSegments(SONGS.songShown(song).sections[0]);
+  assert.deepEqual([...groups[0].items.map(i => i.rel)], ['pair', 'fifth', 'pair', 'fifth', 'none']);
+});
+
+const STOTCO = () => ({
+  songs: [
+    { id: 's1', titel: "You've Got a Friend in Me", kuenstler: 'Misc Cartoons', originalTonart: 'Eb', transposeOffset: 0,
+      abschnitte: [{ name: 'Intro', takte: [['Eb', 'G7'], ['Cm', 'B7'], ['%']] }], notizen: '' },
+    { id: 's2', titel: 'Lemon Tree', kuenstler: "Fool's Garden", originalTonart: 'Am', transposeOffset: 2,
+      abschnitte: [{ name: 'Strophe', takte: [['Am'], ['Em']] }], notizen: 'Capo 8' },
+    { id: 's3', titel: 'Wonderwall', kuenstler: 'Oasis', originalTonart: 'F#m', abschnitte: [{ name: 'Strophe', takte: [['F#m7'], ['A']] }] },
+    { id: 's4', titel: 'Nicht in der Setliste', kuenstler: 'X', originalTonart: 'C', abschnitte: [] },
+  ],
+  setlisten: [{ id: 'sl1', name: 'Song-Sammler', eintraege: [{ songId: 's1' }, { songId: 's2' }, { songId: 's3' }] }],
+  einstellungen: { notation: 'international' },
+});
+
+test('stotco: Format erkannt, eigener Export nicht', () => {
+  assert.equal(SONGS.isStotcoExport(STOTCO()), true);
+  assert.equal(SONGS.isStotcoExport({ format: 'akkord-trainer-songs', songs: [{ title: 'a' }] }), false);
+  assert.equal(SONGS.isStotcoExport([{ title: 'a' }]), false);
+});
+
+test('stotco: Song umwandeln, % aufgelöst, Akkorde 1:1 (klingend), Capo/Offset nur als Notiz', () => {
+  const [a, b] = STOTCO().songs.map(SONGS.stotcoSong);
+  assert.equal(a.sections[0].chords, 'Eb G7 | Cm B7 | B7');
+  assert.equal(a.key, 'Eb');
+  assert.equal(b.key, 'Am');
+  assert.equal(b.sections[0].chords, 'Am | Em');
+  assert.match(b.note, /Capo-Hinweis/);
+  assert.match(b.note, /transponiert auf Bm/);
+});
+
+test('stotco: nur Setliste „Song-Sammler“, ergänzt vorhandene Songs, Neue in „Neu gehört“', () => {
+  const st = SONGS.normalizeState(null);
+  const n0 = st.songs.length;
+  const ueben = st.lists.find(l => l.name === 'Am Üben');
+  st.songs.find(s => s.id === 'seed-lemon-tree').listId = ueben.id;   // schon verschoben
+  const r = SONGS.mergeImport(st, STOTCO());
+  assert.equal(r.stotco, true);
+  assert.equal(r.source, 'setlist');
+  assert.equal(r.total, 3);
+  assert.equal(r.added, 1);
+  assert.equal(r.updated, 2);
+  assert.deepEqual([...r.byTitle], ["You've Got a Friend in Me"]);
+  assert.equal(st.songs.length, n0 + 1);
+  const friend = st.songs.find(s => s.id === 'seed-friend-in-me');
+  assert.equal(friend.artist, 'Randy Newman');          // Interpret bleibt
+  assert.equal(friend.key, 'Eb');
+  assert.equal(friend.sections.length, 1);
+  const lemon = st.songs.find(s => s.id === 'seed-lemon-tree');
+  assert.equal(lemon.listId, ueben.id);                   // Liste bleibt
+  assert.equal(lemon.key, 'Am');
+  const ww = st.songs.find(s => s.title === 'Wonderwall');
+  assert.equal(st.lists.find(l => l.id === ww.listId).name, 'Neu gehört');
+  assert.ok(!st.songs.some(s => s.title === 'Nicht in der Setliste'));
+  // zweiter Import: nichts doppelt, unverändert
+  const r2 = SONGS.mergeImport(st, STOTCO());
+  assert.equal(st.songs.length, n0 + 1);
+  assert.equal(r2.added, 0);
+  assert.equal(r2.unchanged, 3);
+});
+
+test('stotco: ohne Setliste alle Songs; eigene Struktur wird nicht überschrieben', () => {
+  const st = SONGS.normalizeState(null);
+  const lemon = st.songs.find(s => s.id === 'seed-lemon-tree');
+  lemon.sections = SONGS.parseStructure('Eigene: Fm | Cm');
+  lemon.key = 'Fm';
+  const data = STOTCO(); data.setlisten = [];
+  const r = SONGS.mergeImport(st, data);
+  assert.equal(r.source, 'all');
+  assert.equal(r.total, 4);
+  assert.equal(lemon.sections[0].name, 'Eigene');
+  assert.equal(lemon.stotcoId, 's2');
+  // ab jetzt gilt stotco als Quelle für diesen Song
+  const d2 = STOTCO(); d2.songs[1].abschnitte = [{ name: 'Neu', takte: [['Am']] }];
+  SONGS.mergeImport(st, d2);
+  assert.equal(lemon.sections[0].name, 'Neu');
+});
+
+test('stotco: Titel-Abgleich nur bei Eindeutigkeit', () => {
+  const st = SONGS.normalizeState(null);
+  st.songs.push(SONGS.cleanSong({ id: 'sing2', title: 'Sing', artist: 'Ed Sheeran', listId: st.lists[0].id }));
+  const r = SONGS.mergeImport(st, { songs: [{ id: 'q', titel: 'Sing', kuenstler: 'travis ', originalTonart: 'F#m', abschnitte: [] }] });
+  assert.equal(r.added, 0);                                  // Travis exakt (Groß/Klein, Leerzeichen egal)
+  assert.equal(st.songs.find(s => s.id === 'seed-sing-travis').stotcoId, 'q');
+  const r2 = SONGS.mergeImport(st, { songs: [{ id: 'q2', titel: 'Sing', kuenstler: 'Pentatonix', abschnitte: [] }] });
+  assert.equal(r2.added, 1);                                 // zwei Kandidaten → lieber neu
+});
