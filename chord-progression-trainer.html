@@ -945,6 +945,134 @@
     .metro { font-size: 12px; }
     .metro-unit { display: none; }
   }
+
+  /* ============ BLUES (Vom Blues zum Jazz-Blues) ============ */
+  .bl-view {
+    --bl-basis: #6b6578;
+    --bl-quick: #7ab87a;
+    --bl-turn: #6a9bd1;
+    --bl-iiv: #a48bd6;
+    --bl-zwd: #d96b6b;
+    --bl-dim: #d4a85a;
+    --bl-tt: #d97aa8;
+    --bl-back: #5fb3b3;
+    --bl-bird: #c89878;
+    --bl-now: #e0a548;
+    --bl-now-soft: rgba(224, 165, 72, 0.14);
+    display: none;
+  }
+  body.view-blues .main { grid-column: 1 / -1; grid-row: 1 / -1; }
+  body.view-blues .controls,
+  body.view-blues .sidebar,
+  body.view-blues .progress-bar,
+  body.view-blues .chord-area,
+  body.view-blues .transition-bar,
+  body.view-blues .progression-name,
+  body.view-blues .progression-meta,
+  body.view-blues .timer-display { display: none; }
+  body.view-blues .bl-view {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+  }
+  .bl-view .bl-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; }
+  .bl-view .bl-seg { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+  .bl-view .pill { text-transform: none; font-size: 12px; padding: 5px 12px; }
+  .bl-view .bl-levels .pill { min-width: 34px; justify-content: center; font-family: 'JetBrains Mono', monospace; }
+  .bl-view .bl-levels .pill.bl-tb-tab { font-family: inherit; }
+  .bl-view .bl-toggles { display: flex; gap: 16px; }
+  .bl-view .bl-play { display: flex; align-items: center; gap: 12px; }
+  .bl-view .bl-play button.primary { padding: 7px 16px; }
+  .bl-view .bl-tempo { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+  .bl-view .bl-tempo input { width: 110px; accent-color: var(--accent); }
+  .bl-view .bl-tempo output { font-family: 'JetBrains Mono', monospace; color: var(--text-secondary); min-width: 3ch; }
+
+  .bl-view .bl-main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; flex: 1; min-height: 0; }
+  .bl-view .bl-sheet { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
+  .bl-view .bl-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .bl-view .bl-head h2 { font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+  .bl-view .bl-sub { color: var(--text-muted); font-size: 13px; }
+  .bl-view .bl-caveat { font-size: 11px; color: var(--text-muted); border: 1px dashed var(--border-emphasis); border-radius: 999px; padding: 1px 9px; }
+  .bl-view .bl-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted); margin-left: auto; }
+  .bl-view .bl-legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+
+  .bl-view .bl-grid { flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; border-left: 2px solid var(--text-secondary); border-right: 4px double var(--text-secondary); min-height: 0; }
+  .bl-view .bl-bar { position: relative; border-right: 1px solid var(--border-emphasis); min-height: 96px; padding: 22px 6px 8px; display: flex; gap: 4px; align-items: stretch; transition: background 0.12s; }
+  .bl-view .bl-bar:nth-child(4n) { border-right: 0; }
+  .bl-view .bl-bar:nth-child(n+5) { border-top: 1px solid var(--border-subtle); }
+  .bl-view .bl-num { position: absolute; top: 5px; left: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .bl-view .bl-prev { position: absolute; top: 5px; right: 8px; font-size: 11px; color: var(--text-muted); text-decoration: line-through; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+  .bl-view .bl-bar.changed { background: linear-gradient(to bottom, var(--accent-soft), transparent 70%); }
+  .bl-view .bl-bar.now { background: var(--bl-now-soft); box-shadow: inset 0 -3px 0 var(--bl-now); }
+  .bl-view .bl-chord { flex: 1 1 0; min-width: 0; background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; color: var(--text-primary); font-weight: 500; }
+  .bl-view .bl-chord:hover { background: var(--bg-card); border-color: var(--border-emphasis); }
+  .bl-view .bl-chord.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .bl-view .bl-chord.new { border-color: color-mix(in srgb, var(--tc) 70%, transparent); background: color-mix(in srgb, var(--tc) 12%, transparent); }
+  .bl-view .bl-chord.new.sel { box-shadow: 0 0 0 2px var(--accent); }
+  .bl-view .bl-chord.now-chord .bl-sym { color: var(--bl-now); }
+  .bl-view .bl-sym { font-family: 'Fraunces', Georgia, serif; font-weight: 500; font-size: 32px; line-height: 1; white-space: nowrap; letter-spacing: -0.02em; }
+  .bl-view .bl-sym .q { font-size: 0.5em; vertical-align: super; margin-left: 0.05em; letter-spacing: 0; }
+  .bl-view .bl-sym .acc { font-family: 'Apple Symbols', 'Segoe UI Symbol', 'Noto Sans Symbols 2', system-ui, sans-serif; font-weight: 400; font-size: 0.7em; vertical-align: 0.32em; margin-left: 0.02em; }
+  .bl-view .bl-sym .b { font-size: 0.55em; color: var(--text-secondary); }
+  .bl-view .bl-bar.two .bl-sym { font-size: 25px; }
+  .bl-view .bl-roman { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); letter-spacing: 0.03em; white-space: nowrap; }
+  .bl-view .bl-chord.new .bl-roman { color: var(--tc); }
+  .bl-view.no-roman .bl-roman { display: none; }
+  .bl-view .bl-foot { font-size: 12px; color: var(--text-muted); display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .bl-view .bl-panel { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow-y: auto; }
+  .bl-view .bl-card { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px; }
+  .bl-view .bl-kicker { font-family: 'Fraunces', serif; font-size: 12px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; }
+  .bl-view .bl-card h3 { font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+  .bl-view .bl-card p { color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; }
+  .bl-view .bl-tools { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .bl-view .bl-tools li { font-size: 13px; color: var(--text-secondary); padding-left: 16px; position: relative; line-height: 1.45; }
+  .bl-view .bl-tools li::before { content: ""; position: absolute; left: 0; top: 0.45em; width: 9px; height: 9px; border-radius: 2px; background: var(--tc); }
+  .bl-view .bl-tools b { color: var(--text-primary); font-weight: 600; }
+  .bl-view .bl-info .bl-big { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 500; line-height: 1.1; }
+  .bl-view .bl-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0 8px; }
+  .bl-view .bl-chip { font-size: 11px; font-weight: 600; border-radius: 999px; padding: 2px 9px; color: var(--tc); background: color-mix(in srgb, var(--tc) 14%, transparent); border: 1px solid color-mix(in srgb, var(--tc) 45%, transparent); }
+  .bl-view .bl-mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); }
+  .bl-view .bl-was { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .bl-view .bl-info.empty p { color: var(--text-muted); font-style: italic; }
+  .bl-view .bl-tb { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .bl-view .bl-tb .toggle { align-items: flex-start; }
+  .bl-view .bl-tb .toggle input[type="checkbox"] { flex: none; margin-top: 1px; }
+  .bl-view .bl-tb .toggle input[type="checkbox"]:checked { background: color-mix(in srgb, var(--tc) 18%, transparent); border-color: var(--tc); }
+  .bl-view .bl-tb .toggle input[type="checkbox"]:checked::before { background: var(--tc); }
+  .bl-view .bl-tb .t { display: block; font-weight: 600; color: var(--text-primary); }
+  .bl-view .bl-tb .d { display: block; font-size: 12px; color: var(--text-muted); line-height: 1.35; }
+  .bl-view .bl-tb-note { font-size: 12px; color: var(--accent-hover); min-height: 1em; margin-top: 6px; }
+  .bl-view .bl-tb-actions { display: flex; gap: 8px; margin-top: 6px; }
+  .bl-view .bl-tb-actions button { padding: 5px 12px; font-size: 12px; }
+
+  @media (max-width: 1100px) {
+    .bl-view .bl-main { grid-template-columns: minmax(0, 1fr); flex: none; }
+    .bl-view .bl-sheet { min-height: auto; }
+    .bl-view .bl-grid { flex: none; }
+    .bl-view .bl-panel { overflow: visible; }
+    body.view-blues .bl-view { overflow-y: auto; }
+  }
+  @media (max-width: 640px) {
+    .bl-view .bl-controls { gap: 10px 12px; }
+    .bl-view .bl-levels { width: 100%; flex-wrap: nowrap; }
+    .bl-view .bl-levels .pill { flex: 1; min-width: 0; padding: 5px 0; }
+    .bl-view .bl-levels .pill.bl-tb-tab { flex: 2.6; }
+    .bl-view .bl-sheet { padding: 12px 8px 10px; }
+    .bl-view .bl-head h2 { font-size: 18px; }
+    .bl-view .bl-legend { margin-left: 0; }
+    .bl-view .bl-grid { flex: none; }
+    .bl-view .bl-bar { min-height: 84px; padding: 18px 2px 6px; gap: 1px; flex-direction: column; }
+    .bl-view .bl-num { font-size: 10px; left: 4px; top: 3px; }
+    .bl-view .bl-prev { font-size: 9.5px; right: 3px; top: 3px; max-width: 64%; }
+    .bl-view .bl-chord { padding: 3px 1px; gap: 2px; }
+    .bl-view .bl-sym { font-size: 21px; }
+    .bl-view .bl-bar.two .bl-sym { font-size: 17px; }
+    .bl-view .bl-roman { font-size: 9.5px; white-space: normal; line-height: 1.15; }
+    .bl-view .bl-tempo input { width: 90px; }
+  }
 </style>
 </head>
 <body>
@@ -956,6 +1084,7 @@
   <nav class="view-tabs" aria-label="Ansicht">
     <button class="view-tab active" id="tabTrainer" aria-pressed="true">Trainer</button>
     <button class="view-tab" id="tabStandards" aria-pressed="false">Jazz Standards</button>
+    <button class="view-tab" id="tabBlues" aria-pressed="false">Blues</button>
   </nav>
   <div class="header" id="header">
     <div class="progression-name" id="progName">—</div>
@@ -1018,6 +1147,55 @@
       </div>
       <div id="stdSections"></div>
       <div class="std-caveat" id="stdCaveat"></div>
+    </div>
+  </section>
+
+  <!-- ============ BLUES ============ -->
+  <section class="bl-view" id="bluesView" aria-label="Vom Blues zum Jazz-Blues">
+    <div class="bl-controls">
+      <div class="pill-group bl-levels" role="group" aria-label="Level" id="blLevelTabs"></div>
+      <div class="bl-seg"><span>Tonart</span><div class="pill-group" role="group" aria-label="Tonart" id="blKeyTabs"></div></div>
+      <div class="bl-toggles">
+        <label class="toggle"><input type="checkbox" id="blRomanToggle" checked> Stufen</label>
+        <label class="toggle"><input type="checkbox" id="blDiffToggle" checked> Änderungen</label>
+      </div>
+      <div class="bl-play">
+        <button type="button" class="primary" id="blPlayBtn"><span id="blPlayIcon">▶</span> <span id="blPlayLabel">Abspielen</span></button>
+        <div class="bl-tempo"><label for="blTempo">Tempo</label><input type="range" id="blTempo" min="60" max="240" step="4" value="120"><output id="blTempoOut">120</output></div>
+      </div>
+    </div>
+    <div class="bl-main">
+      <div class="bl-sheet">
+        <div class="bl-head">
+          <h2 id="blSheetTitle"></h2>
+          <span class="bl-sub" id="blSheetSub"></span>
+          <span class="bl-caveat" title="Die Akkordfolgen wurden aus dem Gedächtnis notiert und sind nicht gegen eine Quelle geprüft.">Changes ungeprüft, mit Real Book abgleichen</span>
+          <div class="bl-legend" id="blLegend"></div>
+        </div>
+        <div class="bl-grid" id="blGrid"></div>
+        <div class="bl-foot"><span>Akkord antippen für Begründung und Klang. Tasten 1–6 wählen das Level, Leertaste spielt.</span><span id="blFootNote"></span></div>
+      </div>
+      <aside class="bl-panel">
+        <div class="bl-card" id="blLevelCard">
+          <div class="bl-kicker" id="blLevelKicker"></div>
+          <h3 id="blLevelName"></h3>
+          <p id="blLevelText"></p>
+          <div class="bl-kicker" style="margin-top:12px">Neue Mittel</div>
+          <ul class="bl-tools" id="blToolsList"></ul>
+        </div>
+        <div class="bl-card" id="blToolboxCard" hidden>
+          <div class="bl-kicker">Baukasten</div>
+          <h3>Eigenen Blues bauen</h3>
+          <p>Start: Grundblues. Jeder Schalter setzt ein Mittel an seine typische Stelle; markiert ist, was sich gegenüber dem Grundblues ändert.</p>
+          <div class="bl-tb" id="blTbList"></div>
+          <div class="bl-tb-note" id="blTbNote"></div>
+          <div class="bl-tb-actions">
+            <button type="button" id="blTbAll">Alle an</button>
+            <button type="button" id="blTbNone">Alle aus</button>
+          </div>
+        </div>
+        <div class="bl-card bl-info empty" id="blInfo"></div>
+      </aside>
     </div>
   </section>
 </div>
@@ -2158,8 +2336,8 @@ document.getElementById('metroSub').addEventListener('change', e => {
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-  // In den Jazz Standards nur das Metronom per Taste
-  if (currentView === 'standards' && e.code !== 'KeyM') return;
+  // In den Jazz Standards und im Blues nur das Metronom per Taste
+  if (currentView !== 'trainer' && e.code !== 'KeyM') return;
   if (e.code === 'Space') {
     e.preventDefault();
     document.getElementById('btnPlayPause').click();
@@ -2516,24 +2694,29 @@ function renderStdSong() {
 function setView(view) {
   currentView = view;
   const std = view === 'standards';
+  const blues = view === 'blues';
+  const trainer = !std && !blues;
   document.body.classList.toggle('view-standards', std);
-  document.getElementById('tabTrainer').classList.toggle('active', !std);
-  document.getElementById('tabStandards').classList.toggle('active', std);
-  document.getElementById('tabTrainer').setAttribute('aria-pressed', String(!std));
-  document.getElementById('tabStandards').setAttribute('aria-pressed', String(std));
-  // Countdown im Trainer anhalten, solange die Standards offen sind
-  if (std && !isPaused) {
+  document.body.classList.toggle('view-blues', blues);
+  for (const [id, on] of [['tabTrainer', trainer], ['tabStandards', std], ['tabBlues', blues]]) {
+    document.getElementById(id).classList.toggle('active', on);
+    document.getElementById(id).setAttribute('aria-pressed', String(on));
+  }
+  // Countdown im Trainer anhalten, solange Standards oder Blues offen sind
+  if (!trainer && !isPaused) {
     document.getElementById('btnPlayPause').click();
     pausedByView = true;
-  } else if (!std && pausedByView) {
+  } else if (trainer && pausedByView) {
     if (isPaused) document.getElementById('btnPlayPause').click();
     pausedByView = false;
   }
   if (std) renderStandards();
+  if (typeof BLUES !== 'undefined') { if (blues) BLUES.render(); else BLUES.stop(); }
 }
 
 document.getElementById('tabTrainer').addEventListener('click', () => setView('trainer'));
 document.getElementById('tabStandards').addEventListener('click', () => setView('standards'));
+document.getElementById('tabBlues').addEventListener('click', () => setView('blues'));
 document.getElementById('btnStdSetlist').addEventListener('click', () => {
   const title = stdSong().title;
   if (setlist.includes(title)) setlistRemove(title); else setlistAdd(title);
@@ -2543,6 +2726,391 @@ document.getElementById('stdRoman').addEventListener('change', e => {
   stdShowRoman = e.target.checked;
   renderStdSong();
 });
+
+// ============================================================
+// BLUES — Vom Blues zum Jazz-Blues (6 Level + Baukasten)
+// ============================================================
+// Gekapselt in einer IIFE; nach außen nur BLUES.render() / BLUES.stop().
+// Akkorde als Stufenschritt/Halbton relativ zur Tonart -> korrekte
+// Schreibweise in F, Bb, Eb, C. Changes aus dem Gedächtnis notiert, ungeprüft.
+const BLUES = (() => {
+/* ---------- Mittel (Werkzeuge) ---------- */
+const TOOLS = {
+  basis: { name: 'Grundgerüst', color: '--bl-basis' },
+  quick: { name: 'Quick Change', color: '--bl-quick' },
+  turn:  { name: 'Turnaround', color: '--bl-turn' },
+  iiv:   { name: 'II–V', color: '--bl-iiv' },
+  zwd:   { name: 'Zwischendominante', color: '--bl-zwd' },
+  dim:   { name: '♯IV°7', color: '--bl-dim' },
+  tt:    { name: 'Tritonus-Substitution', color: '--bl-tt' },
+  back:  { name: 'Backdoor', color: '--bl-back' },
+  bird:  { name: 'Bird-Changes', color: '--bl-bird' },
+};
+
+/* ---------- Akkorde ----------
+   step/semis: Abstand vom Grundton der Tonart (Stammtonschritte / Halbtöne) -> korrekte Schreibweise in jeder Tonart */
+function c(step, semis, q, roman, tool, why, bass) { return { step, semis, q, roman, tool, why, bass }; }
+const Q = { '7': '7', 'm7': 'm7', 'maj7': 'maj7', 'm7b5': 'm7♭5', 'dim7': '°7' };
+
+const K = {
+  I:      c(0,0,'7','I7','basis','Tonika. Im Blues ist schon die I ein Dominantseptakkord: die kleine Septime ist Blues-Farbe und verlangt keine Auflösung.'),
+  IV:     c(3,5,'7','IV7','basis','Subdominante, ebenfalls als Septakkord. Takt 5 eröffnet den zweiten Formteil.'),
+  V9:     c(4,7,'7','V7','basis','Dominante in Takt 9: höchste Spannung im dritten Formteil.'),
+  IV10:   c(3,5,'7','IV7','basis','IV in Takt 10: der „Rückweg“ V–IV–I, eine plagale Bewegung statt Dominant-Auflösung. Typisch für den frühen Blues.'),
+  I12:    c(0,0,'7','I7','basis','Die Grundform bleibt im letzten Takt auf der Tonika; für die Wiederholung fehlt noch der Zug zurück nach Takt 1.'),
+  IVq:    c(3,5,'7','IV7','quick','Quick Change: die IV kommt schon in Takt 2, danach zurück zur I. Bringt früh Bewegung in die ersten vier Takte.'),
+  V12:    c(4,7,'7','V7','turn','Einfachster Turnaround: V7 im letzten Takt zieht zurück zur I in Takt 1.'),
+  IIofIV: c(4,7,'m7','IIm7/IV','iiv','II–V in die IV: die Tonika in Takt 4 wird zur II–V umgedeutet. Vm7 ist die II von IV.'),
+  VofIV:  c(0,0,'7','V7/IV','iiv','Die I7 wird Dominante der IV: ihre kleine Septime löst sich in die Terz der IV auf. Im Grundblues war das schon angelegt, jetzt mit Vorbereitung durch die II.'),
+  III:    c(2,4,'m7','IIIm7','iiv','IIIm7 vertritt die Tonika (zwei gemeinsame Töne) und ist zugleich die II der folgenden II–V in die IIm7.'),
+  VI:     c(5,9,'7','VI7 (V7/II)','iiv','Zwischendominante zur IIm7: die Dur-Terz ist der Leitton zum Grundton der II.'),
+  II9:    c(1,2,'m7','IIm7','iiv','Statt V7 in Takt 9 beginnt die Kadenz mit IIm7; Takt 9–11 bilden II–V–I.'),
+  V10:    c(4,7,'7','V7','iiv','V7 in Takt 10 ersetzt die IV: Teil der II–V–I in die Tonika.'),
+  VIt:    c(5,9,'7','VI7 (V7/II)','turn','Turnaround I–VI–II–V: VI7 als Zwischendominante zur II im letzten Takt.'),
+  IIt:    c(1,2,'m7','IIm7','turn','Turnaround: IIm7 – Subdominant-Funktion vor der V.'),
+  Vt:     c(4,7,'7','V7','turn','Turnaround: V7 führt zurück nach Takt 1.'),
+  dim:    c(3,6,'dim7','♯IV°7','dim','Verminderter Durchgangsakkord. Bass IV–♯IV–5 steigt chromatisch in die Tonika mit Quinte im Bass. Klanglich ein Dominant-Ersatz (V7♭9 ohne Grundton) zur I.'),
+  Islash: c(0,0,'7','I7/5','dim','Tonika mit der Quinte im Bass: Ziel der chromatischen Basslinie vom ♯IV°7; der Bass steigt danach weiter zur VI7.', [4,7]),
+  VIfull: c(5,9,'7','VI7 (V7/II)','zwd','Zwischendominante, jetzt über den ganzen Takt: Dur-Terz statt der leitereigenen Moll-Terz macht den Zug zur IIm7 zwingender. Bass steigt V–VI–II.'),
+  ttIV:   c(3,6,'7','SubV7/IV','tt','Tritonus-Substitution der V7/IV: gleiche Terz und Septime (vertauscht), der Bass läuft chromatisch abwärts in die IV. Abweichend von der Vorlage ergänzt, damit die chromatische Bassführung schon im ersten Formteil auftaucht.'),
+  ivm:    c(3,5,'m7','IVm7','back','Moll-Subdominante: die Terz der IV wird erniedrigt. Typischer Auftakt zur Backdoor-Kadenz.'),
+  bVII:   c(6,10,'7','♭VII7','back','Backdoor-Dominante: ♭VII7 löst sich einen Ganzton aufwärts in die I auf. IVm7–♭VII7 ist die „Hintertür“-II–V. Ersetzt den ♯IV°7 aus Level 4.'),
+  Iback:  c(0,0,'7','I7','back','Ziel der Backdoor-Kadenz. Der Quintbass aus Level 4 entfällt, weil die Auflösung jetzt vom ♭VII kommt.'),
+  ttVI:   c(2,3,'7','♭VI7 (SubV/II)','tt','Tritonus-Substitution der VI7: Bass fällt chromatisch in die IIm7. Terz und Septime sind dieselben Töne wie beim VI7.'),
+  ttV:    c(1,1,'7','♭II7 (SubV)','tt','Tritonus-Substitution der V7: Bass II–♭II–I fällt chromatisch in die Tonika.'),
+  ttVIt:  c(2,3,'7','♭VI7 (SubV/II)','tt','Turnaround mit Tritonus-Sub: ♭VI7 statt VI7 – chromatischer Bass in die IIm7.'),
+  ttVt:   c(1,1,'7','♭II7 (SubV)','tt','Turnaround mit Tritonus-Sub: ♭II7 statt V7 – Bass fällt chromatisch nach Takt 1.'),
+  // Bird Blues
+  bI:     c(0,0,'maj7','Imaj7','bird','Tonika als maj7 statt Blues-Septakkord: Parker beginnt „hell“, die Blues-Farbe kommt erst in Takt 4.'),
+  bVIIo:  c(6,11,'m7b5','VIIm7♭5 (II/VI)','bird','Beginn einer Kette absteigender II–V: halbverminderte II in die VI (Moll).'),
+  bIII7:  c(2,4,'7','III7 (V7/VI)','bird','Dominante zur VIm7 – erste Kettenstufe.'),
+  bVIm:   c(5,9,'m7','VIm7','bird','Ziel der ersten Kadenz und sofort umgedeutet zur II der nächsten II–V.'),
+  bII7:   c(1,2,'7','II7 (V7/V)','bird','Würde zur V führen, landet aber trugschlüssig auf Vm7: die Kette läuft in Ganztönen abwärts weiter.'),
+  bVm:    c(4,7,'m7','IIm7/IV','bird','Dritte Kettenstufe: II–V in die IV. Damit erreicht die Kette Takt 5 wie in jedem Blues.'),
+  bVofIV: c(0,0,'7','V7/IV','bird','Erst hier taucht der Blues-Septakkord auf der I auf – als Dominante zur IV.'),
+  bivm:   c(3,5,'m7','IVm7','bird','Moll-Subdominante, wie im Backdoor. Die ♭VII7 danach löst aber nicht in die I, sondern in IIIm7, die Tonika-Vertretung.'),
+  bbVII:  c(6,10,'7','♭VII7','bird','Klingt wie die Backdoor-Dominante, führt hier trugschlüssig in IIIm7 (Tonika-Vertreter statt Tonika).'),
+  bIIIm:  c(2,4,'m7','IIIm7','bird','Tonika-Vertreter und Start der chromatisch absteigenden II–V-Kette.'),
+  bVI7:   c(5,9,'7','VI7 (V7/II)','bird','Zwischendominante zur II – wird aber gleich einen Halbton tiefer verschoben statt aufgelöst.'),
+  bbIIIm: c(2,3,'m7','♭IIIm7','bird','Die II–V wird als Ganzes einen Halbton tiefer verschoben (Parallelverschiebung).'),
+  bbVI7:  c(5,8,'7','♭VI7 (SubV/V)','bird','Tritonus-Sub der V7/V; mündet in IIm7–V7. Die Kette Takt 7–10: II–V, einen Halbton tiefer II–V, dann II–V in die I.'),
+  bII:    c(1,2,'m7','IIm7','bird','Ziel der chromatischen Kette, II–V–I in die Tonika wie ab Level 3.'),
+};
+
+/* ---------- Level ---------- */
+const L1 = [[K.I],[K.I],[K.I],[K.I],[K.IV],[K.IV],[K.I],[K.I],[K.V9],[K.IV10],[K.I],[K.I12]];
+const L2 = [[K.I],[K.IVq],[K.I],[K.I],[K.IV],[K.IV],[K.I],[K.I],[K.V9],[K.IV10],[K.I],[K.V12]];
+const L3 = [[K.I],[K.IVq],[K.I],[K.IIofIV,K.VofIV],[K.IV],[K.IV],[K.I],[K.III,K.VI],[K.II9],[K.V10],[K.I,K.VIt],[K.IIt,K.Vt]];
+const L4 = [[K.I],[K.IVq],[K.I],[K.IIofIV,K.VofIV],[K.IV],[K.dim],[K.Islash],[K.VIfull],[K.II9],[K.V10],[K.I,K.VIt],[K.IIt,K.Vt]];
+const L5 = [[K.I],[K.IVq],[K.I],[K.IIofIV,K.ttIV],[K.IV],[K.ivm,K.bVII],[K.Iback],[K.ttVI],[K.II9],[K.ttV],[K.I,K.ttVIt],[K.IIt,K.ttVt]];
+const L6 = [[K.bI],[K.bVIIo,K.bIII7],[K.bVIm,K.bII7],[K.bVm,K.bVofIV],[K.IV],[K.bivm,K.bbVII],[K.bIIIm,K.bVI7],[K.bbIIIm,K.bbVI7],[K.bII],[K.V10],[K.I,K.VIt],[K.IIt,K.Vt]];
+
+const LEVELS = [
+  { name: 'Grundblues', sub: 'I – IV – V, drei Akkorde',
+    text: 'Die Urform: zwölf Takte in drei Viertakt-Gruppen, nur I7, IV7 und V7. Alle drei sind Septakkorde – das ist der Blues-Klang, keine Funktionsharmonik. Hier bleibt der letzte Takt noch auf der Tonika.',
+    tools: [['basis','Drei Stufen als Septakkorde', 'I7, IV7, V7 auf festen Plätzen der Form.']], bars: L1 },
+  { name: 'Quick Change + Turnaround', sub: 'Bewegung am Anfang und am Ende',
+    text: 'Zwei kleine Eingriffe: Die IV kommt schon in Takt 2 („Quick Change“), und der letzte Takt wird zur Dominante, damit die Form in die Wiederholung zieht.',
+    tools: [['quick','Quick Change','IV7 in Takt 2.'],['turn','Turnaround','V7 in Takt 12 führt zurück nach Takt 1.']], bars: L2 },
+  { name: 'II–V-Verbindungen', sub: 'Die Jazz-Kadenz zieht ein',
+    text: 'Jedes Ziel bekommt seine II–V: Takt 4 führt in die IV, Takt 8 in die IIm7, Takt 9–10 werden zur II–V–I. Der Turnaround wird zur I–VI–II–V.',
+    tools: [['iiv','II–V vor Zielakkorden','Vm7–I7 in die IV, IIIm7–VI7 in die II, IIm7–V7 in die I.'],['turn','Turnaround I–VI–II–V','Takte 11–12 als vollständige Kadenzkette.']], bars: L3 },
+  { name: 'Zwischendominanten + ♯IV°', sub: 'Chromatischer Bass in der Mitte',
+    text: 'In Takt 6 verbindet ein verminderter Akkord die IV chromatisch mit der Tonika in Quintlage. Takt 8 wird ganz zur Zwischendominante VI7, der Bass steigt von der IV Schritt für Schritt bis zur VI.',
+    tools: [['dim','♯IV°7 als Durchgang','Bass IV–♯IV–5: ein Septakkord-Ersatz mit Leittonwirkung.'],['dim','I7 mit Quinte im Bass','Ziel des chromatischen Aufstiegs.'],['zwd','Zwischendominante VI7','Ganzer Takt statt IIIm7–VI7.']], bars: L4 },
+  { name: 'Tritonus-Sub & Backdoor', sub: 'Chromatisch abwärts statt in Quinten',
+    text: 'Dominanten werden durch ihren Tritonus-Ersatz getauscht: Der Bass fällt dann chromatisch statt in Quinten. In Takt 6 ersetzt die Backdoor-Kadenz IVm7–♭VII7 den verminderten Akkord.',
+    tools: [['tt','Tritonus-Substitution','SubV statt V: Takte 4, 8, 10, 11, 12.'],['back','Backdoor-Kadenz','IVm7–♭VII7 löst sich in die I auf.']], bars: L5,
+    note: 'Takt 4 abweichend von der Vorlage mit SubV7/IV ergänzt.' },
+  { name: 'Bird Blues', sub: 'Charlie Parker, „Blues for Alice“',
+    text: 'Parker ersetzt die ersten vier Takte durch eine Kette absteigender II–V-Verbindungen, die in der IV landet. Takt 6–9 wiederholen das Prinzip chromatisch. Vom Blues bleiben die Eckpfeiler: IV in Takt 5, II–V–I am Ende.',
+    tools: [['bird','Imaj7 statt I7','Heller Beginn, Blues-Septime erst in Takt 4.'],['bird','Absteigende II–V-Kette','Takte 2–4 in Ganztönen, Takte 7–8 in Halbtönen.'],['bird','Trugschlüsse','♭VII7 in IIIm7, II7 in Vm7: Kadenzen werden umgedeutet statt aufgelöst.']], bars: L6 },
+];
+
+/* ---------- Werkzeugkasten ---------- */
+const TB_OPTS = [
+  ['quick','quick','Quick Change','IV7 in Takt 2.'],
+  ['turn','turn','Turnaround I–VI–II–V','Takte 11–12.'],
+  ['iiv','iiv','II–V einfügen','Takt 4 in die IV, Takt 8 in die II, Takte 9–10 als II–V–I.'],
+  ['zwd','zwd','Zwischendominante VI7','Takt 8 ganz als V7/II (setzt IIm7 in Takt 9).'],
+  ['dim','dim','♯IV°7','Takt 6 als Durchgang, Takt 7 mit Quintbass.'],
+  ['back','back','Backdoor','Takt 6 als IVm7–♭VII7 (ersetzt ♯IV°7).'],
+  ['tt','tt','Tritonus-Sub','Jede Dominante, die eine Quinte abwärts auflöst, wird durch SubV ersetzt.'],
+];
+const SUBS = new Map([[K.VofIV, K.ttIV],[K.VI, K.ttVI],[K.VIfull, K.ttVI],[K.V10, K.ttV],[K.VIt, K.ttVIt],[K.Vt, K.ttVt],[K.V12, K.ttVt]]);
+function composeToolbox(o) {
+  const b = L1.map(x => x.slice());
+  const notes = [];
+  if (o.quick) b[1] = [K.IVq];
+  if (o.iiv) { b[3] = [K.IIofIV, K.VofIV]; b[7] = [K.III, K.VI]; b[8] = [K.II9]; b[9] = [K.V10]; }
+  if (o.zwd) { b[7] = [K.VIfull]; b[8] = [K.II9]; if (!o.iiv) { b[9] = [K.V10]; notes.push('VI7 braucht ein Ziel: Takt 9–10 werden IIm7–V7.'); } }
+  if (o.dim) { b[5] = [K.dim]; b[6] = [K.Islash]; }
+  if (o.back) { b[5] = [K.ivm, K.bVII]; b[6] = [K.Iback]; if (o.dim) notes.push('Backdoor und ♯IV°7 teilen sich Takt 6 – Backdoor gewinnt.'); }
+  if (o.turn) { b[10] = [K.I, K.VIt]; b[11] = [K.IIt, K.Vt]; }
+  if (o.tt) {
+    let n = 0;
+    for (let i = 0; i < 12; i++) b[i] = b[i].map(ch => { const s = SUBS.get(ch); if (s) n++; return s || ch; });
+    if (!n) notes.push('Noch keine auflösende Dominante zum Ersetzen – II–V, VI7 oder Turnaround einschalten.');
+  }
+  return { bars: b, notes };
+}
+
+/* ---------- Tonarten & Schreibweise ---------- */
+const LETTERS = ['C','D','E','F','G','A','B'];
+const NAT = [0,2,4,5,7,9,11];
+const KEYS = { F: { l: 3, pc: 5 }, 'B♭': { l: 6, pc: 10 }, 'E♭': { l: 2, pc: 3 }, C: { l: 0, pc: 0 } };
+const FLAT_NAMES = ['C','D♭','D','E♭','E','F','G♭','G','A♭','A','B♭','B'];
+function spellNote(step, semis, key) {
+  const k = KEYS[key];
+  const L = (k.l + step) % 7, pc = (k.pc + semis) % 12;
+  const acc = ((pc - NAT[L] + 18) % 12) - 6;
+  const name = LETTERS[L] + (acc < 0 ? '♭'.repeat(-acc) : '♯'.repeat(acc));
+  if (Math.abs(acc) > 1 || ['F♭','C♭','E♯','B♯'].includes(name)) return FLAT_NAMES[pc];
+  return name;
+}
+function rootPc(ch, key) { return (KEYS[key].pc + ch.semis) % 12; }
+const accHTML = n => n.replace(/([♭♯]+)/, '<span class="acc">$1</span>');
+function symHTML(ch, key) {
+  const r = accHTML(spellNote(ch.step, ch.semis, key));
+  const b = ch.bass ? `<span class="b">/${spellNote(ch.bass[0], ch.bass[1], key)}</span>` : '';
+  return `${r}<span class="q">${Q[ch.q]}</span>${b}`;
+}
+function symText(ch, key) {
+  return spellNote(ch.step, ch.semis, key) + Q[ch.q] + (ch.bass ? '/' + spellNote(ch.bass[0], ch.bass[1], key) : '');
+}
+const sig = ch => ch.step + ':' + ch.semis + ':' + ch.q + ':' + (ch.bass ? ch.bass.join(',') : '');
+
+const state = { level: 0, key: 'F', roman: true, diff: true, sel: null, tb: { quick: true, turn: true, iiv: false, zwd: false, dim: false, back: false, tt: false } };
+const STORE_KEY = 'chordtrainer_blues';
+try {
+  const s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+  if (s && typeof s === 'object') {
+    if (Number.isInteger(s.level) && s.level >= 0 && s.level <= 6) state.level = s.level;
+    if (KEYS[s.key]) state.key = s.key;
+    if (typeof s.roman === 'boolean') state.roman = s.roman;
+    if (typeof s.diff === 'boolean') state.diff = s.diff;
+    if (s.tb && typeof s.tb === 'object') for (const k in state.tb) if (typeof s.tb[k] === 'boolean') state.tb[k] = s.tb[k];
+  }
+} catch (e) { /* localStorage nicht verfügbar oder kaputt */ }
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ level: state.level, key: state.key, roman: state.roman, diff: state.diff, tb: state.tb })); } catch (e) { /* egal */ }
+}
+
+const isTB = () => state.level === 6;
+let tbNotes = [];
+function currentBars() { if (isTB()) { const r = composeToolbox(state.tb); tbNotes = r.notes; return r.bars; } return LEVELS[state.level].bars; }
+function prevBars() { if (isTB()) return L1; return state.level > 0 ? LEVELS[state.level - 1].bars : null; }
+function isNewChord(bar, i, prev) {
+  if (!prev) return false;
+  if (prev.length !== bar.length) return !prev.some(x => sig(x) === sig(bar[i]));
+  return sig(prev[i]) !== sig(bar[i]);
+}
+const barChanged = (bar, prev) => prev && (prev.length !== bar.length || bar.some((ch, i) => sig(ch) !== sig(prev[i])));
+
+/* ---------- Rendering ---------- */
+const $ = id => document.getElementById(id);
+const tc = t => `var(${TOOLS[t].color})`;
+function renderTabs() {
+  $('blLevelTabs').innerHTML = LEVELS.map((L, i) => `<button type="button" class="pill${state.level === i ? ' active' : ''}" data-l="${i}" aria-pressed="${state.level === i}" title="${L.name}">${i + 1}</button>`).join('')
+    + `<button type="button" class="pill bl-tb-tab${state.level === 6 ? ' active' : ''}" data-l="6" aria-pressed="${state.level === 6}" title="Baukasten">Baukasten</button>`;
+  $('blKeyTabs').innerHTML = Object.keys(KEYS).map(k => `<button type="button" class="pill${state.key === k ? ' active' : ''}" data-k="${k}" aria-pressed="${state.key === k}">${k}</button>`).join('');
+}
+function render() {
+  renderTabs();
+  const view = $('bluesView');
+  view.classList.toggle('no-roman', !state.roman);
+  $('blRomanToggle').checked = state.roman;
+  $('blDiffToggle').checked = state.diff;
+  const bars = currentBars(), prev = prevBars();
+  const tb = isTB();
+  $('blLevelCard').hidden = tb;
+  $('blToolboxCard').hidden = !tb;
+  if (tb) {
+    $('blSheetTitle').textContent = 'Baukasten';
+    $('blSheetSub').textContent = 'Blues in ' + state.key + ' · Unterschiede zum Grundblues';
+    $('blFootNote').textContent = '';
+    renderToolbox();
+  } else {
+    const L = LEVELS[state.level];
+    $('blSheetTitle').textContent = `${state.level + 1} · ${L.name}`;
+    $('blSheetSub').textContent = L.sub + ' · Blues in ' + state.key;
+    $('blLevelKicker').textContent = `Level ${state.level + 1} von 6`;
+    $('blLevelName').textContent = L.name;
+    $('blLevelText').textContent = L.text;
+    $('blToolsList').innerHTML = L.tools.map(([t, n, d]) => `<li style="--tc:${tc(t)}"><b>${n}</b> – ${d}</li>`).join('');
+    $('blFootNote').textContent = L.note || '';
+  }
+  const used = new Set();
+  bars.forEach((bar, bi) => bar.forEach((ch, i) => { if (state.diff && prev && isNewChord(bar, i, prev[bi])) used.add(ch.tool); }));
+  $('blLegend').innerHTML = [...used].map(t => `<span style="--c:${tc(t)}">${TOOLS[t].name}</span>`).join('');
+
+  $('blGrid').innerHTML = bars.map((bar, bi) => {
+    const p = prev ? prev[bi] : null;
+    const changed = state.diff && barChanged(bar, p);
+    const chords = bar.map((ch, i) => {
+      const nw = state.diff && p && isNewChord(bar, i, p);
+      const sel = state.sel && state.sel[0] === bi && state.sel[1] === i;
+      return `<button type="button" class="bl-chord${nw ? ' new' : ''}${sel ? ' sel' : ''}" data-b="${bi}" data-i="${i}" style="--tc:${tc(ch.tool)}" aria-label="${symText(ch, state.key)}, ${ch.roman}">`
+        + `<span class="bl-sym">${symHTML(ch, state.key)}</span><span class="bl-roman">${ch.roman}</span></button>`;
+    }).join('');
+    const prevTxt = changed ? `<span class="bl-prev" title="vorher">${p.map(ch => symText(ch, state.key)).join(' ')}</span>` : '';
+    return `<div class="bl-bar${bar.length > 1 ? ' two' : ''}${changed ? ' changed' : ''}" data-bar="${bi}"><span class="bl-num">${bi + 1}</span>${prevTxt}${chords}</div>`;
+  }).join('');
+  renderInfo();
+  save();
+}
+function renderToolbox() {
+  $('blTbList').innerHTML = TB_OPTS.map(([k, t, n, d]) => `<label class="toggle" style="--tc:${tc(t)}"><input type="checkbox" data-tb="${k}" ${state.tb[k] ? 'checked' : ''}><span><span class="t">${n}</span><span class="d">${d}</span></span></label>`).join('');
+  $('blTbNote').textContent = tbNotes.join(' ');
+}
+function renderInfo() {
+  const box = $('blInfo');
+  const bars = currentBars(), prev = prevBars();
+  const ch = state.sel && bars[state.sel[0]] && bars[state.sel[0]][state.sel[1]];
+  if (!ch) {
+    state.sel = null;
+    box.className = 'bl-card bl-info empty';
+    box.innerHTML = '<div class="bl-kicker">Akkord</div><p>Tippe einen Akkord an: Stufe, Mittel und Begründung erscheinen hier.</p>';
+    return;
+  }
+  const [bi, i] = state.sel;
+  const p = prev ? prev[bi] : null;
+  const nw = p && isNewChord(bars[bi], i, p);
+  const t = TOOLS[ch.tool];
+  box.className = 'bl-card bl-info';
+  box.innerHTML = `<div class="bl-kicker">Takt ${bi + 1}</div>
+    <div class="bl-big">${symHTML(ch, state.key)}</div>
+    <div class="bl-meta"><span class="bl-mono">${ch.roman}</span><span class="bl-chip" style="--tc:${tc(ch.tool)}">${t.name}</span></div>
+    <p>${ch.why}</p>
+    ${nw ? `<div class="bl-was">${isTB() ? 'Im Grundblues' : 'In Level ' + state.level}: ${p.map(x => symText(x, state.key)).join(' ')}</div>` : ''}`;
+}
+
+/* ---------- Audio (eigener AudioContext, getrennt vom Metronom) ---------- */
+const VOICE = { '7': [4,10,14], 'm7': [3,10,14], 'maj7': [4,11,14], 'm7b5': [3,6,10], 'dim7': [3,6,9] };
+let ctx = null, master = null, playing = false, timer = null, nextTime = 0, step = 0, queue = [], raf = 0, lastMark = '', noiseBuf = null;
+function ensureCtx() {
+  if (!ctx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = 0.6;
+    const comp = ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
+  }
+  if (ctx.state !== 'running') ctx.resume();
+  return true;
+}
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function tone(midi, t, dur, type, vol) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.value = mtof(midi);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+}
+function voicing(ch) {
+  let base = 48 + rootPc(ch, state.key); if (base > 54) base -= 12;
+  return VOICE[ch.q].map(i => base + i + (i < 6 && base + i < 52 ? 12 : 0));
+}
+function bassNote(ch, fifth) {
+  const pc = ch.bass && !fifth ? (KEYS[state.key].pc + ch.bass[1]) % 12 : rootPc(ch, state.key);
+  let m = 33 + ((pc - 9 + 12) % 12);
+  if (fifth) { m += 7; if (m > 45) m -= 12; }
+  return m;
+}
+function playChord(ch, t, beatDur) { voicing(ch).forEach(m => tone(m, t, beatDur * 1.4, 'triangle', 0.09)); }
+function hat(t) {
+  if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.05), ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); }
+  const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  s.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = 7000; g.gain.value = 0.12;
+  s.connect(f); f.connect(g); g.connect(master); s.start(t);
+}
+const beatDur = () => 60 / (+$('blTempo').value || 120);
+function scheduleBeat(t) {
+  const bars = currentBars();
+  const bi = Math.floor(step / 4) % 12, beat = step % 4;
+  const bar = bars[bi], bd = beatDur();
+  const per = 4 / bar.length;
+  const ci = Math.min(bar.length - 1, Math.floor(beat / per));
+  const ch = bar[ci];
+  if (beat % per === 0) {
+    playChord(ch, t, bd);
+    tone(bassNote(ch, false), t, bd * 1.8, 'sine', 0.5);
+    tone(bassNote(ch, false) + 12, t, bd * 0.6, 'triangle', 0.05);
+  } else if (bar.length === 1 && beat === 2) {
+    tone(bassNote(ch, true), t, bd * 1.8, 'sine', 0.42);
+  }
+  if (bar.length === 1 && beat === 1) voicing(ch).forEach(m => tone(m, t + bd * 0.5, bd * 0.5, 'triangle', 0.05));
+  if (beat === 1 || beat === 3) hat(t);
+  queue.push({ t, bi, ci });
+}
+function scheduler() {
+  while (nextTime < ctx.currentTime + 0.12) { scheduleBeat(nextTime); nextTime += beatDur(); step++; }
+}
+function draw() {
+  const now = ctx.currentTime;
+  let cur = null;
+  while (queue.length && queue[0].t <= now) cur = queue.shift();
+  if (cur) {
+    const mark = cur.bi + ':' + cur.ci;
+    if (mark !== lastMark) { lastMark = mark; markNow(cur.bi, cur.ci); }
+  }
+  if (playing) raf = requestAnimationFrame(draw);
+}
+function markNow(bi, ci) {
+  const grid = $('blGrid');
+  grid.querySelectorAll('.bl-bar.now').forEach(e => e.classList.remove('now'));
+  grid.querySelectorAll('.bl-chord.now-chord').forEach(e => e.classList.remove('now-chord'));
+  if (bi == null) return;
+  const b = grid.querySelector(`.bl-bar[data-bar="${bi}"]`);
+  if (b) { b.classList.add('now'); const c = b.querySelector(`.bl-chord[data-i="${ci}"]`); if (c) c.classList.add('now-chord'); }
+}
+function start() {
+  if (!ensureCtx()) return;
+  playing = true; step = 0; queue = []; lastMark = '';
+  nextTime = ctx.currentTime + 0.08;
+  timer = setInterval(scheduler, 25); scheduler();
+  raf = requestAnimationFrame(draw);
+  $('blPlayIcon').textContent = '■'; $('blPlayLabel').textContent = 'Stopp';
+}
+function stop() {
+  if (!playing) return;
+  playing = false; clearInterval(timer); cancelAnimationFrame(raf); queue = [];
+  markNow(null); lastMark = '';
+  $('blPlayIcon').textContent = '▶'; $('blPlayLabel').textContent = 'Abspielen';
+}
+function setLevel(l) { state.level = l; state.sel = null; render(); if (playing) { lastMark = ''; } }
+
+/* ---------- Ereignisse ---------- */
+$('blLevelTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setLevel(+b.dataset.l); });
+$('blKeyTabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.key = b.dataset.k; render(); });
+$('blRomanToggle').addEventListener('change', e => { state.roman = e.target.checked; render(); });
+$('blDiffToggle').addEventListener('change', e => { state.diff = e.target.checked; render(); });
+$('blGrid').addEventListener('click', e => {
+  const b = e.target.closest('.bl-chord'); if (!b) return;
+  state.sel = [+b.dataset.b, +b.dataset.i]; render();
+  if (playing) { lastMark = ''; return; }
+  if (!ensureCtx()) return;
+  const ch = currentBars()[state.sel[0]][state.sel[1]];
+  const t = ctx.currentTime + 0.03;
+  playChord(ch, t, 0.8); tone(bassNote(ch, false), t, 1.4, 'sine', 0.5);
+});
+$('blTbList').addEventListener('change', e => { const k = e.target.dataset && e.target.dataset.tb; if (!k) return; state.tb[k] = e.target.checked; state.sel = null; render(); });
+$('blTbAll').addEventListener('click', () => { TB_OPTS.forEach(([k]) => { state.tb[k] = true; }); state.tb.dim = false; render(); });
+$('blTbNone').addEventListener('click', () => { TB_OPTS.forEach(([k]) => { state.tb[k] = false; }); render(); });
+$('blPlayBtn').addEventListener('click', () => { playing ? stop() : start(); });
+$('blTempo').addEventListener('input', e => { $('blTempoOut').textContent = e.target.value; });
+document.addEventListener('keydown', e => {
+  if (currentView !== 'blues') return;
+  const tag = e.target && e.target.tagName;
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if (/^[1-6]$/.test(e.key)) setLevel(+e.key - 1);
+  else if (e.code === 'Space' && tag !== 'BUTTON') { e.preventDefault(); playing ? stop() : start(); }
+});
+
+render();
+return { render, stop };
+})();
 
 // ============================================================
 // FILTER PILLS
