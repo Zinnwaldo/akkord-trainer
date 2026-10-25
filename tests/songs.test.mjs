@@ -477,3 +477,17 @@ test('stotco-Import wendet mergeParts an, Form und Vermerk in der Notiz', () => 
   assert.equal(s.sections[0].chords, 'C | G');
   assert.equal(s.note, 'Alt.\nForm: Intro – Strophe – Strophe\nTeile: Intro = Strophe.');
 });
+
+test('Song-Ansicht groß wie im Trainer: chord-wrapper, Funktionsfarbe, Stufe, eigene Tonart', () => {
+  const lemon = SONGS.cleanSong(SONG_SEED.find(s => s.id === 'seed-lemon-tree'));
+  const html = SONGS.bigSectionsHTML(SONGS.songShown(lemon));
+  assert.match(html, /class="chord-wrapper"/);
+  assert.match(html, /class="chord func-(tonic|subdom|dominant|other)"/);
+  assert.match(html, /class="chord-roman">i</);
+  assert.match(html, /in <strong>Ab<\/strong><span>bIII<\/span>/);
+  assert.equal((html.match(/class="sg-part"/g) || []).length, lemon.sections.length);
+  // gehaltene Akkorde einmal: Strophe beginnt Fm, Cm, Fm (nicht Cm Cm Cm)
+  const strophe = html.split('class="sg-part"')[1];
+  const chords = [...strophe.matchAll(/data-chord="([^"]+)"/g)].map(m => m[1]);
+  assert.deepEqual(chords.slice(0, 3), ['Fm', 'Cm', 'Fm']);
+});

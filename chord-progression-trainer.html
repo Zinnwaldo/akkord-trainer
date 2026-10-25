@@ -1173,10 +1173,25 @@
   .sg-view .sg-detail-head .sg-detail-btns { display: flex; gap: 6px; margin-left: auto; }
   .sg-view .sg-detail .std-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 10px 0; }
   .sg-view .sg-detail .sg-meta { margin-bottom: 4px; }
-  .sg-hw .hw-sec { grid-template-columns: minmax(0, 1fr); }
-  .sg-hw .hw-sec-label { padding-top: 0; margin-bottom: 2px; font-family: inherit; font-size: 13px; }
-  .sg-hw .hw-note { grid-column: 1; }
-  .sg-hw .sg-plain { font-family: 'JetBrains Mono', monospace; font-size: 14px; overflow-wrap: anywhere; }
+  /* Song-Ansicht: Fläche und Akkorde wie die Hauptanzeige des Trainers
+     (.key-block, .key-large, .chords, .chord-wrapper, .chord, .chord-roman) */
+  .sg-view .sg-detail { background: none; border: none; border-radius: 0; padding: 4px 0 0; }
+  .sg-view .sg-keyblock { margin: 6px 0 4px; }
+  .sg-big .sg-part { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 22px 0 26px; border-top: 1px solid var(--border-subtle); }
+  .sg-big .sg-part:first-child { border-top: none; }
+  .sg-big .sg-part-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .sg-big .sg-part-name { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+  .sg-big .sg-part-key { font-family: 'Fraunces', serif; font-size: 20px; color: var(--text-muted); }
+  .sg-big .sg-part-key strong { color: var(--accent); font-weight: 500; }
+  .sg-big .sg-part-key span { font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-left: 6px; }
+  .sg-big .chords { padding: 0; row-gap: 22px; }
+  .sg-big button.chord-wrapper { background: none; border: 1px solid transparent; border-radius: 10px; padding: 4px 6px; color: inherit; font: inherit; cursor: pointer; }
+  .sg-big button.chord-wrapper:hover { background: var(--bg-elevated); }
+  .sg-big button.chord-wrapper.playing { border-color: var(--accent); }
+  .sg-big.no-roman .chord-roman { display: none; }
+  .sg-big.no-colors .chord { color: var(--text-primary); }
+  .sg-big.no-colors .chord .ext { color: inherit; opacity: 0.75; }
+  .sg-big .sg-plain { font-family: 'JetBrains Mono', monospace; font-size: 18px; overflow-wrap: anywhere; text-align: center; }
   .sg-view .sg-detail-foot { font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-top: 8px; line-height: 1.5; }
 
   @media (max-width: 880px) {
@@ -1191,7 +1206,9 @@
     .sg-view .sg-actions { margin-left: 0; width: 100%; }
     .sg-view .sg-actions button { flex: 1; justify-content: center; }
     .sg-view .sg-songs { grid-template-columns: minmax(0, 1fr); }
-    .sg-view .sg-detail { padding: 12px 10px; }
+    .sg-view .sg-detail { padding: 4px 0 0; }
+    .sg-big .chords { gap: 14px 18px; }
+    .sg-big .sg-part { padding: 16px 0 20px; }
     .sg-view .sg-detail-head .sg-detail-btns { margin-left: 0; width: 100%; }
     .sg-view .sg-form select, .sg-view .sg-form input[type="text"], .sg-view .sg-form textarea { font-size: 16px; }
   }
@@ -1369,12 +1386,11 @@
         <div class="sg-meta" id="sgDetailMeta"></div>
         <div class="std-tools">
           <label class="toggle"><input type="checkbox" id="sgHwRoman" checked><span>Stufen</span></label>
-          <label class="toggle"><input type="checkbox" id="sgHwArrows" checked><span>Pfeile</span></label>
-          <label class="toggle"><input type="checkbox" id="sgHwColors"><span title="Funktionsfarben, bezogen auf das Tonzentrum">Farben</span></label>
+          <label class="toggle"><input type="checkbox" id="sgHwColors" checked><span title="Funktionsfarben wie im Trainer, bezogen auf das Tonzentrum">Farben</span></label>
           <label class="toggle"><input type="checkbox" id="sgHwSound" checked><span title="Akkord beim Antippen anspielen">Ton</span></label>
         </div>
-        <div class="hw-legend" id="sgLegend" aria-label="Zeichen"></div>
-        <div class="sg-hw" id="sgSections"></div>
+        <div class="key-block sg-keyblock" id="sgKeyBlock"></div>
+        <div class="sg-big" id="sgSections"></div>
         <div class="sg-detail-foot" id="sgDetailFoot"></div>
       </div>
       <form class="sg-form" id="sgForm" autocomplete="off">
@@ -4121,7 +4137,7 @@ let state = loadState();
 save();   // Seed-Nachträge sofort sichern
 let editId = null;          // null = kein Formular, '' = neuer Song
 let viewId = null;          // Song in der Ansicht (Harmonie-Wege), null = Liste
-const HW = { roman: true, arrows: true, colors: false, sound: true };
+const HW = { roman: true, colors: true, sound: true };
 const $ = id => document.getElementById(id);
 const view = $('songsView');
 const listName = id => (state.lists.find(l => l.id === id) || {}).name || '';
@@ -4183,19 +4199,34 @@ function renderDetail() {
     + `<span class="sg-chip">${INSTRUMENTS[s.instrument]}</span>`;
   const shown = songShown(s);
   const el = $('sgSections');
-  if (shown) {
-    el.innerHTML = stdHwSectionsHTML(shown);
-  } else {
-    el.innerHTML = s.sections.map(x => `<div class="hw-sec"><div class="hw-sec-label">${escapeHTML(x.name)}</div><div class="sg-plain">${escapeHTML(x.chords)}</div></div>`).join('');
-  }
-  el.classList.toggle('hw-arrows', HW.arrows);
-  el.classList.toggle('hw-colors', HW.colors);
-  el.classList.toggle('hw-no-roman', !HW.roman);
+  const k = parseSongKey(shown ? shown.key : s.key);
+  $('sgKeyBlock').innerHTML = k
+    ? `<div class="key-large"><strong>${escapeHTML(shown ? shown.key : s.key)}</strong></div><div class="scale-kbd">${scaleKeyboardSVG(k.semi, k.minor)}</div>`
+    : '';
+  el.innerHTML = shown ? bigSectionsHTML(shown)
+    : s.sections.map(x => `<section class="sg-part"><div class="sg-part-head"><span class="sg-part-name">${escapeHTML(x.name)}</span></div><div class="sg-plain">${escapeHTML(x.chords)}</div></section>`).join('');
+  el.classList.toggle('no-roman', !HW.roman);
+  el.classList.toggle('no-colors', !HW.colors);
   $('sgDetailFoot').innerHTML = shown
-    ? 'Stufen beziehen sich auf das Tonzentrum über der Gruppe: die Songtonart oder die eigene Tonart des Abschnitts („→“ = wird angesteuert, Tonika kommt dort nicht). '
-      + 'Die kleine Stufe neben dem Zentrum zeigt dessen Lage in der Songtonart. Pfeile und Klammern werden aus Grundton-Abstand und Akkordtyp berechnet.'
+    ? 'Stufen und Farben beziehen sich auf die Songtonart, bei Teilen mit eigener Tonart („in Ab“) auf diese; daneben ihre Lage in der Songtonart. '
+      + 'Gehaltene Akkorde stehen einmal. Antippen spielt den Akkord an.'
       + (s.note.trim() ? `<br><strong>Notiz:</strong> ${escapeHTML(s.note)}` : '')
     : 'Tonart eintragen („Bearbeiten“), dann erscheinen Stufen, Tonzentren und Pfeile.';
+}
+
+// Teile groß wie die Trainer-Anzeige: je Teil eine Reihe .chord-wrapper
+// (Akkord + Stufe), gleiche Akkorde hintereinander einmal
+function bigSectionsHTML(shown) {
+  return shown.sections.map(sec => {
+    const items = [];
+    sec.bars.flat().forEach(x => { const last = items[items.length - 1]; if (!last || last.chord !== x.chord) items.push(x); });
+    const c = sec.centers[0];
+    const own = sec.ownKey ? `<span class="sg-part-key">in <strong>${escapeHTML(c.key)}</strong><span>${escapeHTML(c.rel)}</span></span>` : '';
+    const chords = items.map((x, i) => `<button type="button" class="chord-wrapper" style="animation-delay:${Math.min(i, 8) * 0.04}s" data-chord="${escapeHTML(x.chord)}" aria-label="${escapeHTML(x.chord)}, ${escapeHTML(x.local)}">`
+      + `<span class="chord func-${classifyFunction(x.local)}">${formatChord(escapeHTML(x.chord))}</span>`
+      + `<span class="chord-roman">${escapeHTML(x.local)}</span></button>`).join('');
+    return `<section class="sg-part"><div class="sg-part-head"><span class="sg-part-name">${escapeHTML(sec.label)}</span>${own}</div><div class="chords">${chords}</div></section>`;
+  }).join('');
 }
 
 function render() {
@@ -4345,18 +4376,16 @@ $('sgImportFile').addEventListener('change', e => {
 // Song-Ansicht: Zurück, Bearbeiten, Schalter, Ton beim Antippen
 $('sgDetailBack').addEventListener('click', () => { viewId = null; render(); });
 $('sgDetailEdit').addEventListener('click', () => { const id = viewId; openForm(id); viewId = id; });
-[['sgHwRoman', 'roman'], ['sgHwArrows', 'arrows'], ['sgHwColors', 'colors'], ['sgHwSound', 'sound']].forEach(([elId, key]) => {
+[['sgHwRoman', 'roman'], ['sgHwColors', 'colors'], ['sgHwSound', 'sound']].forEach(([elId, key]) => {
   $(elId).addEventListener('change', e => { HW[key] = e.target.checked; if (viewId) renderDetail(); });
 });
 $('sgSections').addEventListener('click', e => {
-  const b = e.target.closest && e.target.closest('.hw-chord');
+  const b = e.target.closest && e.target.closest('.chord-wrapper');
   if (!b) return;
   if (HW.sound) stdHwPlay(b.dataset.chord);
-  $('sgSections').querySelectorAll('.hw-chord.playing').forEach(x => x.classList.remove('playing'));
+  $('sgSections').querySelectorAll('.chord-wrapper.playing').forEach(x => x.classList.remove('playing'));
   b.classList.add('playing');
 });
-// Legende aus dem Standards-Reiter übernehmen
-{ const lg = document.querySelector('#standardsView .hw-legend'); if (lg) $('sgLegend').innerHTML = lg.innerHTML; }
 
 // Tippen im Formular soll keine Tastenkürzel (z. B. M = Metronom) auslösen
 view.addEventListener('keydown', e => {
@@ -4367,7 +4396,7 @@ view.addEventListener('keydown', e => {
 render();
 return { render, nashvilleChord, nashvilleText, normalizeState, mergeImport, applySeed, STORE_KEY,
   parseStructure, structureText, stotcoSong, isStotcoExport, songShown, cleanBarsText, cleanSong,
-  mergeParts, formLine, partType };
+  mergeParts, formLine, partType, bigSectionsHTML };
 })();
 
 // ============================================================
