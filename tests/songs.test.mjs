@@ -268,12 +268,15 @@ test('stotco: Titel-Abgleich nur bei Eindeutigkeit', () => {
 
 // ---------- Seed v2: sieben Songs mit Struktur, Nachreichen in alte Speicherstände ----------
 
-test('SONG_SEED v2: sieben Songs mit Struktur, Tonart, Lemon Tree Refrain in Ab', () => {
+test('SONG_SEED v3: sieben Songs mit Teilen (2–4), Tonart, Lemon Tree Refrain in Ab', () => {
   assert.equal(SONG_SEED.length, 7);
   for (const s of SONG_SEED) {
-    assert.equal(s.v, 2, s.id);
+    assert.equal(s.v, 3, s.id);
     assert.ok(X.parseSongKey(s.key), s.id);
-    assert.ok(s.sections.length >= 4, s.id);
+    assert.ok(s.sections.length >= 2 && s.sections.length <= 4, s.id);
+    assert.equal(new Set(s.sections.map(x => x.name)).size, s.sections.length, s.id);
+    assert.ok(!s.sections.some(x => /\d/.test(x.name)), s.id);   // keine „Strophe 2“ mehr
+    assert.match(s.note, /^Form: /m, s.id);
     assert.ok(SONGS.songShown(SONGS.cleanSong(s)), s.id);
   }
   const lemon = SONG_SEED.find(s => s.id === 'seed-lemon-tree');
@@ -300,7 +303,7 @@ test('Seed v2 kommt in alte Speicherstände: leere Felder werden gefüllt', () =
     assert.equal(mine.sections.length, s.sections.length, s.id);
     assert.equal(mine.note, s.note, s.id);
     assert.equal(mine.listId, 'l1');
-    assert.equal(st.seedApplied[s.id].v, 2);
+    assert.equal(st.seedApplied[s.id].v, 3);
   }
 });
 
@@ -334,8 +337,8 @@ test('Seed-Upgrade: einmalig, später geänderte Seed-Werte ersetzen nur unverä
   const again = SONGS.normalizeState(JSON.parse(JSON.stringify(saved)));
   assert.equal(again.songs.find(s => s.id === 'seed-ho-hey').note, 'von Karsten');
   assert.equal(again.songs.find(s => s.id === 'seed-sing-travis').updated, t0);
-  // gedachte Seed-v3 mit neuer Notiz und Tonart
-  const v3 = SONG_SEED.map(s => ({ ...s, v: 3, note: s.note + ' (v3)' }));
+  // gedachte nächste Seed-Version mit neuer Notiz
+  const v3 = SONG_SEED.map(s => ({ ...s, v: 4, note: s.note + ' (v3)' }));
   const up = SONGS.applySeed(JSON.parse(JSON.stringify(again)), v3);
   assert.equal(up.songs.find(s => s.id === 'seed-ho-hey').note, 'von Karsten');
   assert.match(up.songs.find(s => s.id === 'seed-sing-travis').note, /\(v3\)$/);
@@ -346,5 +349,131 @@ test('App-Start mit altem Speicherstand: Nachträge landen in localStorage', () 
   assert.deepEqual(app.errors, []);
   const stored = JSON.parse(app.localStorage.getItem('chordtrainer_songs'));
   assert.equal(stored.songs.find(s => s.id === 'seed-lemon-tree').key, 'Fm');
-  assert.equal(stored.seedApplied['seed-lemon-tree'].v, 2);
+  assert.equal(stored.seedApplied['seed-lemon-tree'].v, 3);
+});
+
+test('Seed v2 → v3: Ablauf vom Seed wird zu Teilen, Eigenes bleibt', () => {
+  // Stand nach v2: Seed-Werte mit Ablauf (Strophe 1, Strophe 2 …)
+  const v2 = SONG_SEED.map(s => ({ ...s, v: 2, note: 'alte Notiz',
+    sections: [{ name: 'Strophe 1', chords: 'C | F' }, { name: 'Strophe 2', chords: 'C | F' }, { name: 'Refrain', chords: 'G | C' }] }));
+  const st = SONGS.applySeed(SONGS.normalizeState(oldSaved()), []);   // nur Grundstand
+  st.seedApplied = {};
+  for (const s of st.songs) { s.sections = []; s.note = ''; s.key = ''; }
+  SONGS.applySeed(st, v2);
+  assert.equal(st.songs.find(s => s.id === 'seed-sing-travis').sections[0].name, 'Strophe 1');
+  // Karsten ändert bei Ho Hey die Struktur, bei Crazy die Notiz
+  st.songs.find(s => s.id === 'seed-ho-hey').sections = [{ name: 'Mein Teil', chords: 'C | G', key: '' }];
+  st.songs.find(s => s.id === 'seed-crazy-gnarls').note = 'eigen';
+  SONGS.applySeed(st, SONG_SEED);
+  const sing = st.songs.find(s => s.id === 'seed-sing-travis');
+  assert.deepEqual([...sing.sections.map(x => x.name)], ['Strophe', 'Refrain']);
+  assert.match(sing.note, /Form: /);
+  assert.equal(st.songs.find(s => s.id === 'seed-ho-hey').sections[0].name, 'Mein Teil');
+  assert.equal(st.songs.find(s => s.id === 'seed-crazy-gnarls').note, 'eigen');
+  assert.equal(st.seedApplied['seed-sing-travis'].v, 3);
+});
+
+// ---------- mergeParts ----------
+
+const MP = (secs) => SONGS.mergeParts(secs);
+const names = r => [...r.parts.map(p => p.name)];
+
+test('partType: Ziffern, Klammern, englische Namen', () => {
+  assert.equal(SONGS.partType('Refrain 2').label, 'Refrain');
+  assert.equal(SONGS.partType('Strophe 3 (kurz)').label, 'Strophe');
+  assert.equal(SONGS.partType('Verse 1').label, 'Strophe');
+  assert.equal(SONGS.partType('Chorus').label, 'Refrain');
+  assert.equal(SONGS.partType('Pre-Chorus').label, 'Vorrefrain');
+  assert.equal(SONGS.partType('Middle').label, 'Bridge');
+  assert.equal(SONGS.partType('Outro Solo').label, 'Outro');
+  assert.equal(SONGS.partType('Harmonies').label, 'Harmonies');
+  assert.equal(SONGS.partType('Strophe').strong, true);
+  assert.equal(SONGS.partType('Intro').strong, false);
+});
+
+test('mergeParts: gleiche Typen zusammen, Wiederholung auf einen Durchlauf', () => {
+  const r = MP([
+    { name: 'Strophe 1', chords: 'Am | F | C | G | Am | F | C | G | Am | F | C | %' },
+    { name: 'Refrain', chords: 'G | Am | F | C | G | Am | F | C | G' },
+    { name: 'Strophe 2', chords: 'Am | F | C | G' },
+    { name: 'Refrain 2', chords: 'G | Am | F | C' },
+  ]);
+  assert.deepEqual(names(r), ['Strophe', 'Refrain']);
+  assert.equal(r.parts[0].chords, 'Am | F | C | G');
+  assert.deepEqual([...r.parts[0].from], ['Strophe 1', 'Strophe 2']);
+  assert.ok(r.notes.some(n => n.startsWith('Refrain ≈ Strophe')));
+});
+
+test('mergeParts: Takt-Periode hält das Raster (A E | Bm | Bm | A)', () => {
+  const r = MP([{ name: 'Refrain', chords: 'A E | Bm | Bm | A | A E | Bm | Bm | A' }]);
+  assert.equal(r.parts[0].chords, 'A E | Bm | Bm | A');
+});
+
+test('mergeParts: Intro/Outro/Solo gleich einem Teil fallen weg, mit Vermerk', () => {
+  const r = MP([
+    { name: 'Intro', chords: 'Bm F#7 | A E | G D | Em F#7' },
+    { name: 'Strophe', chords: 'Bm | F#7 | % | % | A | E | % | % | G | D | % | % | Em | % | F#7 | %' },
+    { name: 'Refrain', chords: 'G | D | F#7 | Bm' },
+    { name: 'Outro Solo', chords: 'Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7' },
+    { name: 'Zwischenspiel', chords: 'E | A | E | A' },
+  ]);
+  assert.deepEqual(names(r), ['Strophe', 'Refrain', 'Zwischenspiel']);
+  assert.ok(r.notes.includes('Intro = Strophe'));
+  assert.ok(r.notes.includes('Outro = Strophe'));
+});
+
+test('mergeParts: Zusätze und gehaltene Akkorde zählen beim Vergleich nicht (Bm7 = Bm)', () => {
+  const r = MP([
+    { name: 'Intro', chords: 'F#m | Bm | F#m | F#m | Bm | F#m' },
+    { name: 'Strophe 1', chords: 'F#m | Bm7 | % | % | Bm7 | F#m | % | %' },
+  ]);
+  assert.deepEqual(names(r), ['Strophe']);
+  assert.deepEqual([...r.notes], ['Intro = Strophe']);
+});
+
+test('mergeParts: kürzere Fassung als Anfang der längeren → ein Teil; A B A B im Inneren', () => {
+  const r = MP([
+    { name: 'Strophe 1', chords: 'Fm | Cm | Fm | Cm | Fm | Cm | Bbm | Cm | Fm' },
+    { name: 'Strophe 4', chords: 'Fm | Cm | Bbm | Cm | Fm' },
+    { name: 'Refrain 1', chords: 'Am | G | C | Am | G | F | C | F | C | F' },
+    { name: 'Refrain 3', chords: 'Am | G | C | Am | G | F | C' },
+  ]);
+  assert.deepEqual(names(r), ['Strophe', 'Refrain']);
+  assert.equal(r.parts[1].chords, 'Am | G | C | Am | G | F | C | F | C | F');   // längste gewinnt
+});
+
+test('mergeParts: echt abweichende Folge bleibt als Variante, Tonart des Abschnitts bleibt', () => {
+  const r = MP([
+    { name: 'Strophe 1', chords: 'Cm | Eb | Ab | G' },
+    { name: 'Refrain', key: 'Ab', chords: 'Ab | Eb | Fm | Db' },
+    { name: 'Strophe 2', chords: 'C | Ab | Eb | Gsus4 G | Cm | Eb | Ab | G' },
+    { name: 'Strophe 3', chords: 'Fm | Bbm | C7 | Fm' },
+    { name: 'Outro', chords: 'C | Ab | Eb | Gsus4 G | Cm' },
+  ]);
+  assert.deepEqual(names(r), ['Strophe', 'Refrain', 'Strophe (Variante)', 'Strophe (Variante 2)']);
+  assert.equal(r.parts[1].key, 'Ab');
+  assert.ok(r.notes.includes('Outro = Strophe (Variante)'));
+});
+
+test('mergeParts: stotco-Takte mit %, leere Abschnitte fallen weg; formLine', () => {
+  const r = MP([
+    { name: 'Intro', takte: [['F'], ['C'], ['%'], ['%']] },
+    { name: 'Strophe 1', takte: [['C'], ['F'], ['C'], ['%']] },
+    { name: 'Leer', takte: [] },
+    { name: 'Outro', takte: [['F'], ['C'], ['%'], ['%'], ['F'], ['C']] },
+  ]);
+  assert.deepEqual(names(r), ['Intro', 'Strophe']);
+  assert.equal(r.parts[0].chords, 'F | C | C | C');
+  assert.equal(SONGS.formLine([{ ref: 'Intro' }, { ref: 'Strophe 1' }, { ref: 'Strophe 1' }, { ref: 'Outro' }], r.nameOf),
+    'Form: Intro – Strophe – Strophe – Outro');
+  assert.equal(SONGS.formLine([], r.nameOf), '');
+});
+
+test('stotco-Import wendet mergeParts an, Form und Vermerk in der Notiz', () => {
+  const s = SONGS.stotcoSong({ id: 'x', titel: 'T', originalTonart: 'C', notizen: 'Alt',
+    abschnitte: [{ name: 'Intro', takte: [['C'], ['G']] }, { name: 'Strophe 1', takte: [['C'], ['G'], ['C'], ['G']] }, { name: 'Strophe 2', takte: [['C'], ['G']] }],
+    text: [{ ref: 'Intro' }, { ref: 'Strophe 1' }, { ref: 'Strophe 2' }] });
+  assert.deepEqual([...s.sections.map(x => x.name)], ['Strophe']);
+  assert.equal(s.sections[0].chords, 'C | G');
+  assert.equal(s.note, 'Alt.\nForm: Intro – Strophe – Strophe\nTeile: Intro = Strophe.');
 });

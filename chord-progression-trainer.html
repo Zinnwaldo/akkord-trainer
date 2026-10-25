@@ -3566,82 +3566,58 @@ return { render, stop };
 // v = Seed-Version. Wird sie erhöht, kommen key, chords, note und sections
 // beim nächsten Laden auch in schon gespeicherte Seed-Songs, aber nur in
 // Felder, die dort leer sind oder noch den alten Seed-Wert haben
-// (Eigenes bleibt). Stand v2: Struktur aus stotco sheets (Setliste
-// „Song-Sammler“, Export 24.10.), Lemon Tree Refrain/Outro in As-Dur.
+// (Eigenes bleibt). v2: Ablauf aus stotco sheets (Setliste „Song-Sammler“,
+// Export 24.10.). v3: nur noch die Teile (mergeParts), Form und
+// Zusammenlegungen in der Notiz; von Hand: Lemon Tree Refrain in As-Dur,
+// Ho Hey Strophe ohne Überleitungstakte.
 const SONG_SEED = [
-  { id: 'seed-save-tonight', v: 2, list: 'Neu gehört', title: "Save Tonight", artist: "Eagle-Eye Cherry", key: 'Am', chords: '', instrument: 'beides',
-    note: "Korrigiert nach UG-Import: Wiederholungen „x2“ (Intro) und „x4“ (Solo, Outro) ausgeschrieben, der Parser hatte sie verworfen.",
+  { id: 'seed-save-tonight', v: 3, list: 'Neu gehört', title: "Save Tonight", artist: "Eagle-Eye Cherry", key: 'Am', chords: '', instrument: 'beides',
+    note: "Korrigiert nach UG-Import: Wiederholungen „x2“ (Intro) und „x4“ (Solo, Outro) ausgeschrieben, der Parser hatte sie verworfen.\nForm: Intro – Strophe – Refrain – Strophe – Refrain – Solo – Strophe – Refrain – Outro\nTeile: Intro = Strophe, Solo = Strophe, Outro = Strophe, Refrain ≈ Strophe (gleiche Akkordfolge).",
     sections: [
-    { name: "Intro", chords: "Am F | C G | Am F | C G | Am | F | C | G | Am | F | C | G" },
-    { name: "Strophe 1", chords: "Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | C" },
-    { name: "Refrain", chords: "G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G" },
-    { name: "Solo", chords: "Am F | C G | Am F | C G | Am F | C G | Am F | C G" },
-    { name: "Strophe 3", chords: "Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | C" },
-    { name: "Refrain 2", chords: "G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G" },
-    { name: "Outro", chords: "Am | F | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G | Am F | C G | Am F | C G | Am F | C G | Am F | C G | Am | F | C | C | G | Am | F | C | G | Am | F | C | G | Am | F | C | G" },
+    { name: "Strophe", chords: "Am | F | C | G" },
+    { name: "Refrain", chords: "G | Am | F | C" },
   ] },
-  { id: 'seed-lemon-tree', v: 2, list: 'Neu gehört', title: "Lemon Tree", artist: "Fool's Garden", key: 'Fm', chords: '', instrument: 'beides',
-    note: "UG-Vorlage: Kapodaster 8. Bund, Griffe in Am/C. Akkorde hier klingend umgerechnet (+8 Halbtöne). Laut UG ist die Aufnahme etwas zu hoch gestimmt. Korrigiert: Griffbild-Legende „[Chords]“ (F#dim7, G) als Abschnitt entfernt; Tonart war fälschlich F# (vom ersten Legenden-Akkord abgeleitet).",
+  { id: 'seed-lemon-tree', v: 3, list: 'Neu gehört', title: "Lemon Tree", artist: "Fool's Garden", key: 'Fm', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 8. Bund, Griffe in Am/C. Akkorde hier klingend umgerechnet (+8 Halbtöne). Laut UG ist die Aufnahme etwas zu hoch gestimmt. Korrigiert: Griffbild-Legende „[Chords]“ (F#dim7, G) als Abschnitt entfernt; Tonart war fälschlich F# (vom ersten Legenden-Akkord abgeleitet).\nForm: Intro – Strophe – Strophe – Refrain – Zwischenspiel – Strophe – Bridge – Strophe – Refrain – Outro\nTeile: Intro = Strophe, Zwischenspiel = Strophe, Outro = Refrain.",
     sections: [
-    { name: "Intro", chords: "Fm | Cm | Fm | Cm | Bbm | Cm | Fm | Cm | Fm" },
-    { name: "Strophe 1", chords: "Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Bbm | Cm | Fm | Cm | Fm" },
+    { name: "Strophe", chords: "Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Bbm | Cm | Fm | Cm | Fm" },
     { name: "Refrain", key: 'Ab', chords: "Ab | Eb | Eb | Eb | Fm | Cm | Cm | Cm | Db | Eb | Ab | Eb7 | Ab | Eb | Eb | Eb | Fm | Cm | Cm | Cm | Db | Ddim7 | Eb | Eb7" },
-    { name: "Zwischenspiel", chords: "Fm | Fm | Cm | Cm | Fm | Fm | Cm | Cm | Bbm | Bbm | Cm | Cm | Fm | Cm | Fm" },
     { name: "Bridge", chords: "C | Fm | Fm | Fm | Eb | Ab | C | C" },
-    { name: "Strophe 4", chords: "Fm | Cm | Cm | Cm | Fm | Cm | Cm | Cm | Bbm | Cm | Fm | Cm | Fm" },
-    { name: "Outro", key: 'Ab', chords: "Ab | Eb | Eb | Eb | Fm | Cm | Cm | Cm | Db | Eb | Db | Eb | Db | Eb | Ab | Ab" },
   ] },
-  { id: 'seed-sing-travis', v: 2, list: 'Neu gehört', title: "Sing", artist: "Travis", key: 'F#m', chords: '', instrument: 'beides',
-    note: "UG-Vorlage: Kapodaster 2. Bund, Griffe in Em/G. Akkorde hier klingend umgerechnet (+2 Halbtöne). Intro: jeder Akkord etwa 8 Anschläge (Picking-Muster). Korrigiert: Intro-Wiederholung x2 ausgeschrieben; Spielhinweis aus dem Intro-Text in die Notizen verschoben; Refrain-Raster nach dem Instrumentalteil der Vorlage gesetzt (Parser hatte G doppelt und Takte verschoben).",
+  { id: 'seed-sing-travis', v: 3, list: 'Neu gehört', title: "Sing", artist: "Travis", key: 'F#m', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 2. Bund, Griffe in Em/G. Akkorde hier klingend umgerechnet (+2 Halbtöne). Intro: jeder Akkord etwa 8 Anschläge (Picking-Muster). Korrigiert: Intro-Wiederholung x2 ausgeschrieben; Spielhinweis aus dem Intro-Text in die Notizen verschoben; Refrain-Raster nach dem Instrumentalteil der Vorlage gesetzt (Parser hatte G doppelt und Takte verschoben).\nForm: Intro – Strophe – Refrain – Strophe – Refrain – Instrumental – Strophe – Refrain\nTeile: Intro = Strophe, Instrumental = Refrain.",
     sections: [
-    { name: "Intro", chords: "F#m | Bm | F#m | F#m | Bm | F#m" },
-    { name: "Strophe 1", chords: "F#m | Bm7 | Bm7 | Bm7 | Bm7 | F#m | F#m | F#m | F#m | Bm7 | Bm7 | Bm7 | Bm7 | F#m | F#m | F#m" },
-    { name: "Refrain", chords: "A E | Bm | Bm | A | A E | Bm | Bm | A" },
-    { name: "Instrumental", chords: "A E | Bm | Bm | A | A E | Bm | Bm | A" },
-    { name: "Strophe 3", chords: "F#m | Bm7 | Bm7 | Bm7 | F#m | Bm7 | Bm7 | Bm7 | F#m | F#m | F#m | F#m" },
-    { name: "Refrain 2", chords: "A E | Bm | Bm | A | A E | Bm | Bm | A | A E | Bm | Bm | A | A E | Bm | Bm | A" },
+    { name: "Strophe", chords: "F#m | Bm7 | Bm7 | Bm7 | Bm7 | F#m | F#m | F#m" },
+    { name: "Refrain", chords: "A E | Bm | Bm | A" },
   ] },
-  { id: 'seed-ho-hey', v: 2, list: 'Neu gehört', title: "Ho Hey", artist: "The Lumineers", key: 'C', chords: '', instrument: 'beides',
-    note: "Korrigiert: Tonart war fälschlich F (vom ersten Intro-Akkord abgeleitet), richtig C.",
+  { id: 'seed-ho-hey', v: 3, list: 'Neu gehört', title: "Ho Hey", artist: "The Lumineers", key: 'C', chords: '', instrument: 'beides',
+    note: "Korrigiert: Tonart war fälschlich F (vom ersten Intro-Akkord abgeleitet), richtig C.\nForm: Intro – Strophe – Strophe – Refrain – Strophe – Refrain – Bridge – Refrain – Outro\nTeile: Outro = Intro.",
     sections: [
-    { name: "Intro", chords: "F | C | C | C | F | C | C | C | F | C | C | C | F | C | C | C | F | F | F | F" },
-    { name: "Strophe 1", chords: "C | F | C | C | C | F | C | C | C | F | C | C | C | C | C | C | Am | G | F | C | F | C | C | C | F | C | C | C" },
-    { name: "Strophe 2", chords: "C | F | C | C | C | F | C | C | C | F | C | C | C | C | C | C | Am | G | F | C" },
+    { name: "Intro", chords: "F | C | C | C" },
+    { name: "Strophe", chords: "C | F | C | C | C | F | C | C | C | F | C | C | C | C | C | C | Am | G | F | C" },
     { name: "Refrain", chords: "Am | G | C | C | Am | G | G | G | F | C | C | C | F | C | C | C | F | C | C | C | F | C | C | C | F | F | F | F" },
-    { name: "Strophe 3", chords: "C | F | C | C | C | F | C | C | C | F | C | C | C | Am | G | F | C | Am | G | F | C" },
-    { name: "Refrain 2", chords: "Am | G | C | C | Am | G | C | C" },
     { name: "Bridge", chords: "F | C | G | C | F | C | Gsus | G | F | C | G | C" },
-    { name: "Refrain 3", chords: "Am | G | C | C | Am | G | G | G | F | C | C | C" },
-    { name: "Outro", chords: "F | C | C | C | F | C | C | C | F | C | C | C" },
   ] },
-  { id: 'seed-crazy-gnarls', v: 2, list: 'Neu gehört', title: "Crazy", artist: "Gnarls Barkley", key: 'Cm', chords: '', instrument: 'beides',
-    note: "UG-Vorlage: Kapodaster 3. Bund, Griffe in Am. Akkorde hier klingend umgerechnet (+3 Halbtöne). Offen: UG schreibt am Anfang von Strophe 2/3 und im Outro C-Dur (Griff A) statt Cm, Tippfehler oder Absicht unklar.",
+  { id: 'seed-crazy-gnarls', v: 3, list: 'Neu gehört', title: "Crazy", artist: "Gnarls Barkley", key: 'Cm', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 3. Bund, Griffe in Am. Akkorde hier klingend umgerechnet (+3 Halbtöne). Offen: UG schreibt am Anfang von Strophe 2/3 und im Outro C-Dur (Griff A) statt Cm, Tippfehler oder Absicht unklar.\nForm: Strophe – Refrain – Strophe (Variante) – Refrain – Strophe (Variante) – Refrain – Outro\nTeile: Outro = Strophe (Variante), Refrain ≈ Strophe (gleiche Akkordfolge).",
     sections: [
-    { name: "Strophe 1", chords: "Cm | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ab | Ab | Ab | Ab | Gsus4 | G | G | G | Cm | Cm | Cm | Cm | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
+    { name: "Strophe", chords: "Cm | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
     { name: "Refrain", chords: "Cm | Cm | Cm | Cm | Eb | Eb | Eb | Eb | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
-    { name: "Strophe 2", chords: "C | Ab | Ab | Ab | Ebmaj7 | Gsus4 | G | G | Cm | Eb | Eb | Eb | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
-    { name: "Refrain 2", chords: "Cm | Cm | Cm | Cm | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ebmaj7 | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
-    { name: "Outro", chords: "C | Ab | Ebmaj7 | Gsus4 | G | Cm" },
+    { name: "Strophe (Variante)", chords: "C | Ab | Ab | Ab | Ebmaj7 | Gsus4 | G | G | Cm | Eb | Eb | Eb | Ab | Ab | Ab | Ab | Gsus4 | G | G | G" },
   ] },
-  { id: 'seed-friend-in-me', v: 2, list: 'Neu gehört', title: "You've Got a Friend in Me", artist: "Randy Newman", key: 'Eb', chords: '', instrument: 'beides',
-    note: "UG-Vorlage: Kapodaster 3. Bund, Griffe in C (Key: Eb). Akkorde hier klingend umgerechnet (+3 Halbtöne). Swing. Korrigiert: Griffbild-Liste „Special Chords“ als Abschnitt entfernt; in Zeilen mit Taktstrichen (z. B. „D7 G | C E7 | …“) hatte der Parser die Akkorde vor dem ersten Strich verworfen, D7 G am Ende von Strophe 1, 2, 3 und der Schlussakkord nachgetragen. Offen: Strophen-Takt 2 Bbaug (UG) vs. Bb7 (zweite UG-Version); vorletzte Kadenz F7 vs. Fm7.",
+  { id: 'seed-friend-in-me', v: 3, list: 'Neu gehört', title: "You've Got a Friend in Me", artist: "Randy Newman", key: 'Eb', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 3. Bund, Griffe in C (Key: Eb). Akkorde hier klingend umgerechnet (+3 Halbtöne). Swing. Korrigiert: Griffbild-Liste „Special Chords“ als Abschnitt entfernt; in Zeilen mit Taktstrichen (z. B. „D7 G | C E7 | …“) hatte der Parser die Akkorde vor dem ersten Strich verworfen, D7 G am Ende von Strophe 1, 2, 3 und der Schlussakkord nachgetragen. Offen: Strophen-Takt 2 Bbaug (UG) vs. Bb7 (zweite UG-Version); vorletzte Kadenz F7 vs. Fm7.\nForm: Intro – Strophe – Strophe – Bridge – Strophe (Variante)",
     sections: [
     { name: "Intro", chords: "Eb G7 | Cm B7 | Eb Bb | Eb Bbaug | Eb9 Bbaug" },
-    { name: "Strophe 1", chords: "Eb | Bbaug | Eb | Eb7 | Ab | Adim7 | Eb | Eb7 | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | F7 | Bb | Eb | C7 | F7 | Bb | Eb G7 | Cm B7 | Eb Bb" },
-    { name: "Strophe 2", chords: "Eb | Bbaug | Eb | Eb7 | Ab | Adim7 | Eb | Eb7 | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | F7 | Bb | Eb | C7 | F7 | Bb | Eb Eb7" },
+    { name: "Strophe", chords: "Eb | Bbaug | Eb | Eb7 | Ab | Adim7 | Eb | Eb7 | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | Ab | Eb | G7 | Cm | F7 | Bb | Eb | C7 | F7 | Bb | Eb G7 | Cm B7 | Eb Bb" },
     { name: "Bridge", chords: "Ab | D | D | D | Eb | D7 | Eb | Eb | D | D7 | D7 | D7 | Gm | C7 | C7 | C7 | Fm | Bb | Bb | Bb" },
-    { name: "Strophe 3", chords: "Eb | Bbaug | Eb | Eb7 | Ab | Adim7 | Eb | Eb7 | Ab | Adim7 | Eb | G7 | Cm | F7 | Bb | Eb | C7 | F7 | Bb | Eb | C7 | F7 | Bb | Eb G7 | Cm B7 | Eb Bb | Eb" },
+    { name: "Strophe (Variante)", chords: "Eb | Bbaug | Eb | Eb7 | Ab | Adim7 | Eb | Eb7 | Ab | Adim7 | Eb | G7 | Cm | F7 | Bb | Eb | C7 | F7 | Bb | Eb | C7 | F7 | Bb | Eb G7 | Cm B7 | Eb Bb | Eb" },
   ] },
-  { id: 'seed-hotel-california', v: 2, list: 'Neu gehört', title: "Hotel California", artist: "Eagles", key: 'Bm', chords: '', instrument: 'beides',
-    note: "UG-Vorlage: Kapodaster 2. Bund, Griffe in Am. Akkorde hier klingend umgerechnet (+2 Halbtöne). Korrigiert: Wiederholungen x2 (Intro), x3 (Outro Solo), x2 (Harmonies, Fade-out) ausgeschrieben.",
+  { id: 'seed-hotel-california', v: 3, list: 'Neu gehört', title: "Hotel California", artist: "Eagles", key: 'Bm', chords: '', instrument: 'beides',
+    note: "UG-Vorlage: Kapodaster 2. Bund, Griffe in Am. Akkorde hier klingend umgerechnet (+2 Halbtöne). Korrigiert: Wiederholungen x2 (Intro), x3 (Outro Solo), x2 (Harmonies, Fade-out) ausgeschrieben.\nForm: Intro – Strophe – Refrain – Strophe – Refrain – Strophe – Outro – Harmonies\nTeile: Intro = Strophe, Outro = Strophe, Harmonies = Strophe.",
     sections: [
-    { name: "Intro", chords: "Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7 | A | E | G | D | Em | F#7" },
-    { name: "Strophe", chords: "Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7 | Bm | F#7 | F#7 | F#7 | A | A | A | A | E | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7" },
+    { name: "Strophe", chords: "Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7" },
     { name: "Refrain", chords: "G | D | D | D | F#7 | Bm | Bm | Bm | G | D | D | D | Em | F#7 | F#7 | F#7" },
-    { name: "Strophe 2", chords: "Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | F#7 | F#7 | F#7 | Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7" },
-    { name: "Strophe 3", chords: "Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7 | Bm | F#7 | F#7 | F#7 | A | E | E | E | G | D | D | D | Em | Em | Em | Em | F#7 | F#7 | F#7 | F#7" },
-    { name: "Outro Solo", chords: "Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7 | A | E | G | D | Em | F#7" },
-    { name: "Harmonies", chords: "Bm | F#7 | A | E | G | D | Em | F#7 | Bm | F#7 | A | E | G | D | Em | F#7" },
   ] },
 ];
 
@@ -3829,7 +3805,8 @@ function mergeImport(st, data) {
 //   setlisten: [{ name, eintraege: [{ songId, offsetOverride? }] }] }
 // Gibt es eine Setliste „Song-Sammler“, kommen nur deren Songs, sonst alle.
 // Akkorde und originalTonart in stotco gelten als klingend und werden 1:1
-// übernommen ('%' = Takt gehalten, 'N.C.' = Pause). transposeOffset (Spieltonart
+// übernommen ('%' = Takt gehalten, 'N.C.' = Pause); der Ablauf wird per
+// mergeParts zu Teilen verdichtet. transposeOffset (Spieltonart
 // in stotco) ändert nichts, steht nur in der Notiz. Ein „Capo N“ in den Notizen
 // wird nicht umgerechnet, sondern als Prüfhinweis vermerkt.
 const STOTCO_SETLIST = 'song-sammler';
@@ -3858,16 +3835,9 @@ function stotcoSong(raw) {
   const notes = String(raw.notizen || '');
   const capo = /\bcapo\s*\d/i.test(notes);
   const key = cleanKey(raw.originalTonart);
-  const sections = (Array.isArray(raw.abschnitte) ? raw.abschnitte : []).map(a => {
-    let prev = '';
-    const bars = (Array.isArray(a && a.takte) ? a.takte : []).map(bar => (Array.isArray(bar) ? bar : [bar]).map(c => {
-      c = String(c || '').trim();
-      if (c === '%' || c === '') return prev;
-      prev = c;
-      return c;
-    }).filter(Boolean).join(' ')).filter(Boolean);
-    return { name: a && a.name, chords: bars.join(' | ') };
-  });
+  // Ablauf → Teile (Strophe, Refrain, …), Form aus text[] als Notizzeile
+  const merged = mergeParts(Array.isArray(raw.abschnitte) ? raw.abschnitte : []);
+  const sections = merged.parts;
   const off = ((Number(raw.transposeOffset) || 0) % 12 + 12) % 12;
   const extra = [];
   if (capo) extra.push('Capo-Hinweis aus stotco: prüfen, ob die Akkorde klingend sind.');
@@ -3875,7 +3845,9 @@ function stotcoSong(raw) {
   return {
     title, artist: String(raw.kuenstler || raw.artist || '').trim(), key,
     sections: cleanSections(sections),
-    note: [notes.trim().replace(/([^.!?])$/, '$1.'), ...extra].filter(Boolean).join(' '),
+    note: [[notes.trim().replace(/([^.!?])$/, '$1.'), ...extra].filter(Boolean).join(' '),
+      formLine(raw.text, merged.nameOf),
+      merged.notes.length ? 'Teile: ' + merged.notes.join(', ') + '.' : ''].filter(Boolean).join('\n'),
     stotcoId: String(raw.id || ''),
   };
 }
@@ -3931,6 +3903,160 @@ function mergeStotco(st, data) {
     if (JSON.stringify(mine) !== before) { mine.updated = Date.now(); res.updated++; } else res.unchanged++;
   }
   return res;
+}
+
+// ---------- Teile statt Ablauf (mergeParts) ----------
+// Aus dem Ablauf eines Songs (Strophe 1, Refrain, Strophe 2, Refrain 2 …)
+// die verschiedenen Teile machen:
+// - Typ aus dem Namen (Ziffern und Klammern weg, Verse → Strophe …)
+// - Akkordfolge normalisieren: '%' auflösen, gleiche Akkorde hintereinander
+//   zusammenziehen, direkt wiederholte Blöcke (A B A B → A B) einmal, dann
+//   Periode erkennen (Auffüll-Takte am Ende fallen so weg). Zum Vergleich
+//   nur Grundton + Dreiklang (Bm7 = Bm, Ebmaj7 = Eb); gespeichert wird das Original.
+// - Gleicher Typ + gleiche Folge (oder eine ist Anfang der anderen, ab
+//   3 Akkorden) → ein Teil; die längste Fassung gewinnt, bei reiner
+//   Wiederholung auf einen Durchlauf gekürzt. Abweichende → „Typ (Variante)“.
+// - Intro/Outro/Solo/Zwischenspiel/…, die einem anderen Teil gleichen,
+//   fallen weg, mit Vermerk „Intro = Strophe“.
+// Eingabe: [{ name, chords: 'Am F | C G', key }] oder stotco { name, takte }.
+const PART_TYPES = [
+  [/^(vor-?refrain|pre-?chorus|prechorus)/, 'Vorrefrain', true],
+  [/^(nach-?refrain|post-?chorus|part-?chorus)/, 'Nachrefrain', true],
+  [/^(strophe|verse|vers)\b/, 'Strophe', true],
+  [/^(refrain|chorus|last chorus)/, 'Refrain', true],
+  [/^(bridge|middle)/, 'Bridge', true],
+  [/^intro/, 'Intro', false],
+  [/^outro/, 'Outro', false],
+  [/^solo/, 'Solo', false],
+  [/^(zwischenspiel|interlude)/, 'Zwischenspiel', false],
+  [/^instrumental/, 'Instrumental', false],
+];
+function partType(name) {
+  const base = String(name || '').replace(/\(.*?\)/g, '').replace(/[\s\d.]+$/, '').trim() || 'Teil';
+  const n = base.toLowerCase();
+  for (const [re, label, strong] of PART_TYPES) if (re.test(n)) return { label, strong };
+  return { label: base, strong: false };
+}
+// Takte als Arrays, '%' (ganzer Takt oder Akkord) = Akkord davor
+function partBars(sec) {
+  let prev = '';
+  const raw = Array.isArray(sec.takte) ? sec.takte.map(b => (Array.isArray(b) ? b : [b]).map(String))
+    : String(sec.chords || '').split('|').map(b => b.trim().split(/\s+/).filter(Boolean)).filter(b => b.length);
+  return raw.map(bar => bar.map(c => { c = c.trim(); if (c === '%' || !c) return prev; prev = c; return c; }).filter(Boolean))
+    .filter(b => b.length);
+}
+const collapse = arr => arr.filter((c, i) => i === 0 || c !== arr[i - 1]);
+function simpleChord(c) {
+  const q = stdHwQuality(c);
+  if (!q) return c;
+  const t = { minor: 'm', half: 'dim', dim: 'dim' }[q.quality] || (/^(aug|\+)/.test(q.ext) ? '+' : '');
+  return (q.semi ?? c) + t;
+}
+// A B A B → A B, an jeder Stelle, kurze Blöcke zuerst
+function squeeze(seq) {
+  let s = seq.slice(), changed = true;
+  while (changed) {
+    changed = false;
+    for (let L = 1; L <= s.length / 2 && !changed; L++) {
+      for (let i = 0; i + 2 * L <= s.length; i++) {
+        if (s.slice(i, i + L).join(' ') === s.slice(i + L, i + 2 * L).join(' ')) {
+          s.splice(i + L, L); s = collapse(s); changed = true; break;
+        }
+      }
+    }
+  }
+  return s;
+}
+// kleinste Periode p (Rest am Ende darf Anfang sein), sonst null
+function period(seq) {
+  for (let p = 1; p < seq.length; p++) {
+    if (seq.length < p + 1 || (p === 1 && seq.length < 2)) break;
+    if (seq.every((c, i) => c === seq[i % p])) return p;
+  }
+  return null;
+}
+function partSig(bars) {
+  const simple = collapse(bars.flat().map(simpleChord));
+  let seq = squeeze(simple);
+  const p = period(seq);
+  if (p) seq = seq.slice(0, p);
+  // Kreis (A B C D = C D A B), wenn sich die Folge wiederholt
+  let canon = seq.join(' ');
+  if (p || simple.length >= 2 * seq.length) {
+    for (let r = 1; r < seq.length; r++) {
+      const rot = seq.slice(r).concat(seq.slice(0, r)).join(' ');
+      if (rot < canon) canon = rot;
+    }
+  }
+  return { seq, canon };
+}
+const isPrefix = (a, b) => a.length >= 3 && a.length <= b.length && a.every((c, i) => c === b[i]);
+const sameParts = (a, b) => a.canon === b.canon || isPrefix(a.seq, b.seq) || isPrefix(b.seq, a.seq);
+// Bei reiner Wiederholung nur einen Durchlauf behalten (Takte, Raster bleibt).
+// Erst Takt-Periode (A E | Bm | Bm | A ×2 → einmal), sonst Akkord-Kreis.
+function oneCycle(bars) {
+  const keys = bars.map(b => b.join(' '));
+  for (let P = 1; 2 * P <= keys.length; P++) {
+    if (keys.every((k, i) => k === keys[i % P])) return bars.slice(0, P);
+  }
+  const seq = collapse(bars.flat());
+  const p = period(seq);
+  if (!p || seq.length < 2 * p) return bars;
+  let n = 0, last = '';
+  for (let i = 0; i < bars.length; i++) {
+    for (const c of bars[i]) if (c !== last) { n++; last = c; }
+    const next = bars[i + 1];
+    if (n >= p && (!next || (next[0] === seq[0] && next[0] !== last))) return bars.slice(0, i + 1);
+  }
+  return bars;
+}
+function mergeParts(sections) {
+  const items = (Array.isArray(sections) ? sections : []).map((sec, idx) => {
+    const bars = partBars(sec || {});
+    return { idx, name: String(sec && sec.name || ''), key: cleanKey(sec && sec.key), type: partType(sec && sec.name), bars, sig: partSig(bars) };
+  }).filter(it => it.bars.length);
+  const groups = [];   // { label, strong, members: [] }
+  const notes = [];
+  const nameOf = new Map();   // Abschnittsname → Teil-Name (für die Form)
+  for (const it of items) {
+    const g = groups.find(x => x.label === it.type.label && sameParts(x.members[0].sig, it.sig))
+      || groups.find(x => x.label === it.type.label && x.members.some(m => sameParts(m.sig, it.sig)));
+    if (g) { g.members.push(it); continue; }
+    groups.push({ label: it.type.label, strong: it.type.strong, members: [it] });
+  }
+  // Varianten benennen
+  const count = {};
+  for (const g of groups) {
+    const n = (count[g.label] = (count[g.label] || 0) + 1);
+    g.name = n === 1 ? g.label : `${g.label} (Variante${n > 2 ? ' ' + (n - 1) : ''})`;
+  }
+  // Schwache Teile, die einem anderen gleichen, fallen weg
+  const kept = [];
+  for (const g of groups) {
+    const twin = !g.strong && groups.find(o => o !== g && (o.strong || groups.indexOf(o) < groups.indexOf(g)) && !o.dropped
+      && o.members.some(m => g.members.some(x => sameParts(m.sig, x.sig))));
+    if (twin) { g.dropped = true; notes.push(`${g.name} = ${twin.name}`); }
+    else kept.push(g);
+  }
+  for (const g of groups) for (const m of g.members) nameOf.set(m.name, g.dropped ? g.label : g.name);
+  // Starke Teile mit gleicher Folge bleiben getrennt, aber mit Vermerk
+  kept.forEach((g, i) => {
+    const twin = kept.slice(0, i).find(o => o.members[0].sig.canon === g.members[0].sig.canon);
+    if (twin) notes.push(`${g.name} ≈ ${twin.name} (gleiche Akkordfolge)`);
+  });
+  const parts = kept.map(g => {
+    const win = g.members.reduce((a, b) => (b.bars.length > a.bars.length ? b : a));
+    const key = (g.members.find(m => m.key) || {}).key || '';
+    const bars = oneCycle(win.bars);
+    return { name: g.name, key, chords: bars.map(b => b.join(' ')).join(' | '), from: g.members.map(m => m.name) };
+  });
+  return { parts, notes, nameOf };
+}
+// Form aus stotco text[] (Reihenfolge der Abschnitte), kurz als Zeile
+function formLine(textRefs, nameOf) {
+  const refs = (Array.isArray(textRefs) ? textRefs : []).map(t => t && t.ref).filter(Boolean);
+  if (!refs.length) return '';
+  return 'Form: ' + refs.map(r => (nameOf && nameOf.get(r)) || partType(r).label).join(' – ');
 }
 
 // ---------- Harmonie-Wege für Songs mit Struktur ----------
@@ -4240,7 +4366,8 @@ view.addEventListener('keydown', e => {
 
 render();
 return { render, nashvilleChord, nashvilleText, normalizeState, mergeImport, applySeed, STORE_KEY,
-  parseStructure, structureText, stotcoSong, isStotcoExport, songShown, cleanBarsText, cleanSong };
+  parseStructure, structureText, stotcoSong, isStotcoExport, songShown, cleanBarsText, cleanSong,
+  mergeParts, formLine, partType };
 })();
 
 // ============================================================
