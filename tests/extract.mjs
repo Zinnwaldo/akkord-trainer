@@ -41,6 +41,11 @@ const EXPORT_NAMES = [
   'stdHwRelation', 'stdHwSegments', 'stdHwRelKey', 'stdHwSectionsHTML',
   // Songs (Song-Sammler)
   'SONG_SEED', 'SONGS',
+  // Aufwärmen
+  'SYNTH', 'WARMUP', 'WU_ABCJS', 'WU_MAJOR_KEYS', 'WU_MINOR_KEYS', 'WU_SCALE_FINGERS_RH', 'WU_FIGURE_IDX',
+  'wuParseNote', 'wuSpellAbove', 'wuMajorScaleNames', 'wuMajorScale', 'wuRelativeMajor', 'wuKeySignature',
+  'wuChordQuality', 'wuChordFigure', 'wuFigureBars', 'wuScaleBars', 'wuTonicName', 'wuTransposeChords',
+  'wuScaleKeyFor', 'wuAbc', 'wuKeyboardSVG',
 ];
 
 export function readHtml() {

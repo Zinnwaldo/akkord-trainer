@@ -766,6 +766,7 @@
   /* ============ ANSICHTEN (Trainer / Jazz Standards) ============ */
   .view-tabs {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
     margin-bottom: 18px;
   }
@@ -1212,6 +1213,72 @@
     .sg-view .sg-detail-head .sg-detail-btns { margin-left: 0; width: 100%; }
     .sg-view .sg-form select, .sg-view .sg-form input[type="text"], .sg-view .sg-form textarea { font-size: 16px; }
   }
+
+  /* ============ AUFWÄRMEN ============ */
+  .wu-view { display: none; }
+  body.view-warmup .main { grid-column: 1 / -1; grid-row: 1 / -1; }
+  body.view-warmup .controls,
+  body.view-warmup .sidebar,
+  body.view-warmup .progress-bar,
+  body.view-warmup .chord-area,
+  body.view-warmup .transition-bar,
+  body.view-warmup .progression-name,
+  body.view-warmup .progression-meta,
+  body.view-warmup .timer-display { display: none; }
+  body.view-warmup .main { min-width: 0; }
+  body.view-warmup .wu-view { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
+  .wu-view .wu-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+  .wu-view .pill { text-transform: none; font-size: 12px; padding: 5px 12px; }
+  .wu-view .wu-keyseg { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; }
+  .wu-view .wu-keyseg .pill { min-width: 36px; justify-content: center; }
+  .wu-view .wu-timer { font-family: 'JetBrains Mono', monospace; font-size: 18px; padding: 4px 12px; min-width: 76px; justify-content: center; }
+  .wu-view .wu-timer.paused { color: var(--text-muted); border-style: dashed; }
+  .wu-view .wu-timer.done { color: var(--accent-hover); border-color: var(--accent); }
+  .wu-view .wu-main { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; flex: 1; min-height: 0; }
+  .wu-view .wu-sheet { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; overflow-y: auto; }
+  .wu-view .wu-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .wu-view .wu-head h2 { font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+  .wu-view .wu-sub { color: var(--text-muted); font-size: 13px; }
+  .wu-view .wu-text { color: var(--text-secondary); font-size: 14px; line-height: 1.5; max-width: 70ch; }
+  .wu-view .wu-paper { background: #f7f3ea; color: #1a1825; border-radius: 6px; padding: 8px 6px; min-height: 80px; }
+  .wu-view .wu-paper[hidden] { display: none !important; }
+  .wu-view .wu-paper svg { display: block; }
+  .wu-view .wu-loading { color: #6b6578; font-size: 13px; padding: 20px 10px; }
+  .wu-view .wu-fallback { font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.7; white-space: pre-wrap; padding: 6px 8px; }
+  .wu-view .wu-msg { font-size: 12px; color: var(--accent-hover); }
+  .wu-view .wu-msg:empty { display: none; }
+  .wu-view .wu-big { display: flex; flex-wrap: wrap; gap: 14px 22px; }
+  .wu-view .wu-big:empty { display: none; }
+  .wu-view .wu-big-chord { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 8px; border: 1px solid transparent; }
+  .wu-view .wu-big-chord.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .wu-view .wu-big-chord .sym { font-family: 'Fraunces', Georgia, serif; font-size: 52px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; }
+  .wu-view .acc { font-family: 'Apple Symbols', 'Segoe UI Symbol', 'Noto Sans Symbols 2', system-ui, sans-serif; font-weight: 400; font-size: 0.75em; vertical-align: 0.3em; margin-left: 0.02em; }
+  .wu-view .wu-big-chord .tones { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); }
+  .wu-view .wu-side { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow-y: auto; }
+  .wu-view .wu-kbd-label { font-family: 'Fraunces', serif; font-size: 13px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.04em; }
+  .wu-view .wu-kbd-svg { display: block; width: 100%; max-height: 260px; }
+  .wu-view .wu-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .wu-view .wu-chips:empty { display: none; }
+  .wu-view .wu-chip { font-family: 'Fraunces', Georgia, serif; font-size: 17px; padding: 6px 12px; min-height: 40px; }
+  .wu-view .wu-chip.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-hover); }
+  .wu-view .wu-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .wu-view .wu-actions button { padding: 9px 18px; font-size: 14px; min-height: 44px; }
+  .wu-view .wu-actions button.active { border-color: var(--accent); color: var(--accent-hover); }
+  .wu-view .wu-hint { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
+
+  @media (max-width: 1000px) {
+    .wu-view .wu-main { grid-template-columns: minmax(0, 1fr); flex: none; }
+    .wu-view .wu-sheet, .wu-view .wu-side { overflow: visible; }
+    body.view-warmup .wu-view { overflow-y: auto; }
+  }
+  @media (max-width: 640px) {
+    .wu-view .wu-controls { gap: 8px 10px; }
+    .wu-view .wu-steps { width: 100%; flex-wrap: nowrap; }
+    .wu-view .wu-steps .pill { flex: 1; min-width: 0; padding: 5px 4px; justify-content: center; }
+    .wu-view .wu-sheet { padding: 12px 8px; }
+    .wu-view .wu-head h2 { font-size: 18px; }
+    .wu-view .wu-big-chord .sym { font-size: 36px; }
+  }
 </style>
 </head>
 <body>
@@ -1225,6 +1292,7 @@
     <button class="view-tab" id="tabStandards" aria-pressed="false">Jazz Standards</button>
     <button class="view-tab" id="tabBlues" aria-pressed="false">Blues</button>
     <button class="view-tab" id="tabSongs" aria-pressed="false">Song-Sammler</button>
+    <button class="view-tab" id="tabWarmup" aria-pressed="false">Aufwärmen</button>
   </nav>
   <div class="header" id="header">
     <div class="progression-name" id="progName">—</div>
@@ -1416,6 +1484,37 @@
           <button type="button" id="sgCancel">Abbrechen</button>
         </div>
       </form>
+    </div>
+  </section>
+
+  <!-- ============ AUFWÄRMEN ============ -->
+  <section class="wu-view" id="warmupView" aria-label="Aufwärmen">
+    <div class="wu-controls">
+      <div class="pill-group wu-steps" role="group" aria-label="Block" id="wuSteps"></div>
+      <button type="button" class="wu-timer" id="wuTimer">5:00</button>
+      <button type="button" class="primary" id="wuNext">Weiter →</button>
+      <div class="wu-keyseg"><span>Tonart</span><div class="pill-group" role="group" aria-label="Tonart" id="wuKeyTabs"></div></div>
+      <button type="button" id="wuNextKey" title="Eine Quinte weiter im Quintenzirkel, zurück zu Block 1">Nächste Tonart</button>
+    </div>
+    <div class="wu-main">
+      <div class="wu-sheet">
+        <div class="wu-head"><h2 id="wuTitle"></h2><span class="wu-sub" id="wuSub"></span></div>
+        <p class="wu-text" id="wuText"></p>
+        <div class="wu-paper" id="wuNotes"></div>
+        <div class="wu-msg" id="wuNotesMsg" role="status"></div>
+        <div class="wu-big" id="wuBig"></div>
+      </div>
+      <aside class="wu-side">
+        <div class="wu-kbd-label" id="wuKbdLabel"></div>
+        <div class="wu-kbd" id="wuKbd"></div>
+        <div class="wu-chips" id="wuChips"></div>
+        <div class="wu-actions">
+          <button type="button" class="primary" id="wuPlay">▶ Vorspielen</button>
+          <button type="button" id="wuMetro" aria-pressed="false">♩ Metronom</button>
+        </div>
+        <div class="wu-hint" id="wuHint"></div>
+        <div class="wu-hint">Folge kommt aus dem Trainer (dort wechseln). Rechte Hand, ohne Begleitung. Leertaste: Vorspielen, →: Weiter.</div>
+      </aside>
     </div>
   </section>
 </div>
@@ -3119,11 +3218,13 @@ function setView(view) {
   const std = view === 'standards';
   const blues = view === 'blues';
   const songs = view === 'songs';
-  const trainer = !std && !blues && !songs;
+  const warmup = view === 'warmup';
+  const trainer = !std && !blues && !songs && !warmup;
   document.body.classList.toggle('view-standards', std);
   document.body.classList.toggle('view-blues', blues);
   document.body.classList.toggle('view-songs', songs);
-  for (const [id, on] of [['tabTrainer', trainer], ['tabStandards', std], ['tabBlues', blues], ['tabSongs', songs]]) {
+  document.body.classList.toggle('view-warmup', warmup);
+  for (const [id, on] of [['tabTrainer', trainer], ['tabStandards', std], ['tabBlues', blues], ['tabSongs', songs], ['tabWarmup', warmup]]) {
     document.getElementById(id).classList.toggle('active', on);
     document.getElementById(id).setAttribute('aria-pressed', String(on));
   }
@@ -3138,12 +3239,14 @@ function setView(view) {
   if (std) renderStandards();
   if (typeof BLUES !== 'undefined') { if (blues) BLUES.render(); else BLUES.stop(); }
   if (songs && typeof SONGS !== 'undefined') SONGS.render();
+  if (typeof WARMUP !== 'undefined') { if (warmup) WARMUP.render(); else WARMUP.leave(); }
 }
 
 document.getElementById('tabTrainer').addEventListener('click', () => setView('trainer'));
 document.getElementById('tabStandards').addEventListener('click', () => setView('standards'));
 document.getElementById('tabBlues').addEventListener('click', () => setView('blues'));
 document.getElementById('tabSongs').addEventListener('click', () => setView('songs'));
+document.getElementById('tabWarmup').addEventListener('click', () => setView('warmup'));
 document.getElementById('btnStdSetlist').addEventListener('click', () => {
   const title = stdSong().title;
   if (setlist.includes(title)) setlistRemove(title); else setlistAdd(title);
@@ -3181,6 +3284,37 @@ document.getElementById('stdHwHideAll').addEventListener('click', () => {
   document.querySelectorAll('#stdSections .hw-chord').forEach(b => b.classList.remove('revealed'));
   stdHwUpdateCount();
 });
+
+// ============================================================
+// SYNTH — kleiner gemeinsamer Klangerzeuger (Blues, Aufwärmen)
+// ============================================================
+// Ein AudioContext mit Master-Gain und Kompressor, getrennt vom Metronom.
+// tone() liefert den Oszillator zurück, damit Aufrufer abbrechen können.
+const SYNTH = (() => {
+  let ctx = null, master = null;
+  function ensure() {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      ctx = new AC();
+      master = ctx.createGain(); master.gain.value = 0.6;
+      const comp = ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
+    }
+    if (ctx.state !== 'running') ctx.resume();
+    return true;
+  }
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  function tone(midi, t, dur, type, vol) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = mtof(midi);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+    return o;
+  }
+  return { ensure, tone, mtof, ctx: () => ctx, master: () => master };
+})();
 
 // ============================================================
 // BLUES — Vom Blues zum Jazz-Blues (6 Level + Baukasten)
@@ -3440,29 +3574,15 @@ function renderInfo() {
     ${nw ? `<div class="bl-was">${isTB() ? 'Im Grundblues' : 'In Level ' + state.level}: ${p.map(x => symText(x, state.key)).join(' ')}</div>` : ''}`;
 }
 
-/* ---------- Audio (eigener AudioContext, getrennt vom Metronom) ---------- */
+/* ---------- Audio (gemeinsamer SYNTH, getrennt vom Metronom) ---------- */
 const VOICE = { '7': [4,10,14], 'm7': [3,10,14], 'maj7': [4,11,14], 'm7b5': [3,6,10], 'dim7': [3,6,9] };
 let ctx = null, master = null, playing = false, timer = null, nextTime = 0, step = 0, queue = [], raf = 0, lastMark = '', noiseBuf = null;
 function ensureCtx() {
-  if (!ctx) {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return false;
-    ctx = new AC();
-    master = ctx.createGain(); master.gain.value = 0.6;
-    const comp = ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
-  }
-  if (ctx.state !== 'running') ctx.resume();
+  if (!SYNTH.ensure()) return false;
+  ctx = SYNTH.ctx(); master = SYNTH.master();
   return true;
 }
-const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
-function tone(midi, t, dur, type, vol) {
-  const o = ctx.createOscillator(), g = ctx.createGain();
-  o.type = type; o.frequency.value = mtof(midi);
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
-}
+const tone = SYNTH.tone;
 function voicing(ch) {
   let base = 48 + rootPc(ch, state.key); if (base > 54) base -= 12;
   return VOICE[ch.q].map(i => base + i + (i < 6 && base + i < 52 ? 12 : 0));
@@ -4417,6 +4537,543 @@ function buildPills(containerId, items, getActive, onSelect) {
     c.appendChild(pill);
   });
 }
+
+// ============================================================
+// AUFWÄRMEN — 15 Minuten in 3 Blöcken (Mini-Version, Testwoche ab 25.10.2026)
+// ============================================================
+// Block 1 Finger: Fünftonfigur 1-2-3-4-5-4-3-2 über jeden Akkord der im
+//   Trainer gewählten Folge. Fünftonraum nach Akkordart (Dur/Dominante
+//   0-2-4-5-7, Moll 0-2-3-5-7, halbvermindert/vermindert 0-1-3-5-6),
+//   Fingersatz immer 1–5.
+// Block 2 Tonleiter: Dur rechts, eine Oktave, Standard-Fingersatz.
+// Block 3 Anwendung: über dieselbe Folge improvisieren, Impuls + Metronom.
+// Nur rechte Hand, kein MIDI, keine Begleitung (bewusst: erst nach der
+// Testwoche). Noten per abcjs, erst beim Öffnen des Reiters vom CDN geladen;
+// Klaviatur und Vorspielen funktionieren auch ohne.
+
+// ---------- Notenschreibung (Buchstabe + Vorzeichen, Oktave nach Buchstaben) ----------
+const WU_LETTERS = 'CDEFGAB';
+const WU_LETTER_SEMIS = [0, 2, 4, 5, 7, 9, 11];
+const WU_ACC = { 'bb': -2, 'b': -1, '': 0, '#': 1, '##': 2 };
+
+function wuParseNote(name) {
+  const m = String(name).match(/^([A-G])(bb|b|##|#)?$/);
+  if (!m) return null;
+  const li = WU_LETTERS.indexOf(m[1]);
+  const acc = WU_ACC[m[2] || ''];
+  return { li, acc, semi: (WU_LETTER_SEMIS[li] + acc + 12) % 12 };
+}
+function wuNoteName(li, acc) {
+  return WU_LETTERS[li] + (acc > 0 ? '#'.repeat(acc) : 'b'.repeat(-acc));
+}
+// Ton `steps` Stammtonstufen und `semis` Halbtöne über `root` (Grundton in
+// Buchstaben-Oktave rootOct, 4 = eingestrichene Oktave). Liefert Name,
+// Buchstabe, Vorzeichen, Buchstaben-Oktave und MIDI-Nummer.
+function wuSpellAbove(root, rootOct, steps, semis) {
+  const r = wuParseNote(root);
+  const liAbs = r.li + steps;
+  const li = liAbs % 7;
+  const oct = rootOct + Math.floor(liAbs / 7);
+  const midi = 12 * (rootOct + 1) + WU_LETTER_SEMIS[r.li] + r.acc + semis;
+  const acc = midi - (12 * (oct + 1) + WU_LETTER_SEMIS[li]);
+  return { name: wuNoteName(li, acc), li, acc, oct, midi };
+}
+
+// ---------- Dur-Tonleitern ----------
+const WU_MAJOR_STEPS = [0, 2, 4, 5, 7, 9, 11];
+// Reihenfolge Quintenzirkel; Fis und Ges beide, weil beide gebräuchlich sind.
+const WU_MAJOR_KEYS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F'];
+const WU_MINOR_KEYS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'Eb', 'Bb', 'F'];
+// Standard-Fingersatz rechte Hand, eine Oktave aufwärts (8 Töne, Grundton bis
+// Grundton); abwärts dieselben Finger rückwärts. Daumen bei den b-Tonarten
+// auf C und F, bei Fis/Ges auf H/Ces und Eis/F, bei Des auf F und C.
+const WU_SCALE_FINGERS_RH = {
+  'C':  [1, 2, 3, 1, 2, 3, 4, 5],
+  'G':  [1, 2, 3, 1, 2, 3, 4, 5],
+  'D':  [1, 2, 3, 1, 2, 3, 4, 5],
+  'A':  [1, 2, 3, 1, 2, 3, 4, 5],
+  'E':  [1, 2, 3, 1, 2, 3, 4, 5],
+  'B':  [1, 2, 3, 1, 2, 3, 4, 5],
+  'F#': [2, 3, 4, 1, 2, 3, 1, 2],
+  'Gb': [2, 3, 4, 1, 2, 3, 1, 2],
+  'Db': [2, 3, 1, 2, 3, 4, 1, 2],
+  'Ab': [3, 4, 1, 2, 3, 1, 2, 3],
+  'Eb': [3, 1, 2, 3, 4, 1, 2, 3],
+  'Bb': [4, 1, 2, 3, 1, 2, 3, 4],
+  'F':  [1, 2, 3, 4, 1, 2, 3, 4],
+};
+
+function wuMajorScaleNames(key) {
+  return WU_MAJOR_STEPS.map((s, i) => wuSpellAbove(key, 4, i, s).name);
+}
+// Eine Oktave auf und ab: 8 Töne aufwärts, 7 abwärts, jeweils mit Finger.
+function wuMajorScale(key) {
+  const fingers = WU_SCALE_FINGERS_RH[key];
+  if (!fingers) return null;
+  const up = fingers.map((f, i) => ({ ...wuSpellAbove(key, 4, i, i === 7 ? 12 : WU_MAJOR_STEPS[i]), finger: f }));
+  const down = up.slice(0, 7).reverse();
+  return { key, up, down, notes: up.concat(down) };
+}
+// Paralleles Dur zu einem Moll-Grundton (c → Es, cis → E)
+function wuRelativeMajor(minorRoot) {
+  return wuSpellAbove(minorRoot, 4, 2, 3).name;
+}
+// Vorzeichnung als Buchstabe → Vorzeichen, für "C", "F#", "Gb", "Ebm", "C#m"
+function wuKeySignature(key) {
+  const m = String(key).match(/^([A-G][#b]?)(m?)$/);
+  if (!m) return {};
+  const major = m[2] ? wuRelativeMajor(m[1]) : m[1];
+  const sig = {};
+  WU_MAJOR_STEPS.forEach((s, i) => { const n = wuSpellAbove(major, 4, i, s); sig[n.li] = n.acc; });
+  return sig;
+}
+
+// ---------- Fünftonfigur ----------
+const WU_FIVE = {
+  major:    [0, 2, 4, 5, 7],
+  dominant: [0, 2, 4, 5, 7],
+  minor:    [0, 2, 3, 5, 7],
+  dim:      [0, 1, 3, 5, 6],
+};
+const WU_QUALITY_LABEL = { major: 'Dur', dominant: 'Dominante', minor: 'Moll', dim: 'vermindert' };
+// 1-2-3-4-5-4-3-2: Index in den Fünftonraum, Finger = Index + 1
+const WU_FIGURE_IDX = [0, 1, 2, 3, 4, 3, 2, 1];
+
+// Akkordart aus dem Symbol (ohne Slash-Bass)
+function wuChordQuality(chord) {
+  const main = String(chord).split('/')[0];
+  const m = main.match(/^([A-G][#b]?)(.*)$/);
+  if (!m) return null;
+  const q = m[2];
+  if (/^(m7b5|m7♭5|ø|dim|°)/.test(q)) return 'dim';
+  if (/^(m(?!aj)|min|-)/.test(q)) return 'minor';
+  if (/^(7|9|11|13|alt)/.test(q)) return 'dominant';
+  return 'major';
+}
+function wuFiveNotes(root, quality) {
+  return WU_FIVE[quality].map((s, i) => ({ ...wuSpellAbove(root, 4, i, s), finger: i + 1 }));
+}
+function wuEnharmonics(root) {
+  const r = wuParseNote(root);
+  const out = [];
+  for (let li = 0; li < 7; li++) {
+    for (let acc = -1; acc <= 1; acc++) {
+      const name = wuNoteName(li, acc);
+      if (name !== root && (WU_LETTER_SEMIS[li] + acc + 12) % 12 === r.semi) out.push(name);
+    }
+  }
+  return out;
+}
+const wuHasDouble = notes => notes.some(n => Math.abs(n.acc) > 1);
+const wuAccCount = notes => notes.reduce((a, n) => a + Math.abs(n.acc), 0);
+
+// Fünftonraum für einen Akkord. Der Grundton bleibt, wie er in der Folge
+// steht (Ces in Ges-Dur, Fis in D-Dur). Nur wenn der Fünftonraum sonst
+// Doppelvorzeichen bräuchte (z. B. Ais-Dur, Fes-Dur), wird der Grundton
+// enharmonisch umgeschrieben (B statt Ais, E statt Fes).
+function wuChordFigure(chord) {
+  const [main, bass] = String(chord).split('/');
+  const m = main.match(/^([A-G][#b]?)(.*)$/);
+  if (!m) return null;
+  const quality = wuChordQuality(main);
+  let root = m[1];
+  let notes = wuFiveNotes(root, quality);
+  if (wuHasDouble(notes)) {
+    const alt = wuEnharmonics(root)
+      .map(r => ({ r, notes: wuFiveNotes(r, quality) }))
+      .filter(x => !wuHasDouble(x.notes))
+      .sort((a, b) => wuAccCount(a.notes) - wuAccCount(b.notes))[0];
+    if (alt) { root = alt.r; notes = alt.notes; }
+  }
+  return { chord: root + m[2] + (bass ? '/' + bass : ''), original: chord, root, quality, notes };
+}
+// Ein Takt Achtel pro Akkord, am Ende der Grundton des letzten Akkords als Ganze.
+function wuFigureBars(chords) {
+  const figs = chords.map(wuChordFigure).filter(Boolean);
+  const bars = figs.map(f => ({ chord: f.chord, notes: WU_FIGURE_IDX.map(i => ({ ...f.notes[i], len: 1 })) }));
+  if (figs.length) bars.push({ chord: '', notes: [{ ...figs[figs.length - 1].notes[0], len: 8 }] });
+  return bars;
+}
+function wuScaleBars(key) {
+  const sc = wuMajorScale(key);
+  if (!sc) return [];
+  const down = sc.down.map((n, i) => ({ ...n, len: i === 6 ? 2 : 1 }));
+  return [{ chord: '', notes: sc.up.map(n => ({ ...n, len: 1 })) }, { chord: '', notes: down }];
+}
+
+// ---------- Folge aus dem Trainer in die Aufwärm-Tonart ----------
+function wuTonicName(semi, gb, minor) {
+  const s = ((semi % 12) + 12) % 12;
+  if (minor) return STD_ROOTS_MINOR[s];
+  return s === 6 ? (gb ? 'Gb' : 'F#') : SEMI_TO_NOTE_FLAT[s];
+}
+// Akkorde (Bibliothek in C notiert) per Buchstaben-Abstand umschreiben
+function wuTransposeChords(chords, fromRoot, toRoot, minor) {
+  const interval = (NOTE_TO_SEMI[toRoot] - NOTE_TO_SEMI[fromRoot] + 12) % 12;
+  const letterShift = (WU_LETTERS.indexOf(toRoot[0]) - WU_LETTERS.indexOf(fromRoot[0]) + 7) % 7;
+  const flats = keyPrefersFlats(toRoot, minor);
+  return chords.map(c => transposeStandardChord(c, interval, letterShift, flats));
+}
+// Tonleiter für Block 2: Dur-Tonart der Folge, bei Moll-Folgen das parallele Dur
+// (gleiche Töne wie natürliches Moll; Moll-Tonleitern kommen erst in Stufe 2).
+function wuScaleKeyFor(tonic, minor) {
+  return minor ? wuRelativeMajor(tonic) : tonic;
+}
+
+// ---------- ABC-Notation ----------
+function wuAbcNote(n, barAcc, sig) {
+  const slot = n.li + ':' + n.oct;
+  const cur = slot in barAcc ? barAcc[slot] : (sig[n.li] || 0);
+  let acc = '';
+  if (n.acc !== cur) {
+    acc = { '-2': '__', '-1': '_', '0': '=', '1': '^', '2': '^^' }[n.acc];
+    barAcc[slot] = n.acc;
+  }
+  const L = WU_LETTERS[n.li];
+  const letter = n.oct >= 5 ? L.toLowerCase() + "'".repeat(n.oct - 5) : L + ','.repeat(4 - n.oct);
+  return acc + letter + (n.len && n.len !== 1 ? n.len : '');
+}
+// bars: [{ chord, notes: [{li, acc, oct, finger, len (Achtel)}] }]
+function wuAbc(keySig, bars, perLine = 4) {
+  const sig = wuKeySignature(keySig);
+  const lines = [];
+  let line = [];
+  bars.forEach((bar, bi) => {
+    const barAcc = {};
+    let pos = 0, txt = '';
+    bar.notes.forEach((n, i) => {
+      if (pos > 0 && pos % 4 === 0) txt += ' ';      // Balken in Vierergruppen
+      txt += (i === 0 && bar.chord ? `"${bar.chord}"` : '') + (n.finger ? `!${n.finger}!` : '') + wuAbcNote(n, barAcc, sig);
+      pos += n.len || 1;
+    });
+    line.push(txt);
+    // Zeilenumbruch alle perLine Takte; ein einzelner Schlusstakt bleibt in der Zeile davor
+    if (line.length >= perLine && bi < bars.length - 2) { lines.push(line.join(' | ') + ' |'); line = []; }
+  });
+  if (line.length) lines.push(line.join(' | ') + ' |');
+  if (lines.length) lines[lines.length - 1] = lines[lines.length - 1].replace(/ \|$/, ' |]');
+  return `X:1\nM:4/4\nL:1/8\nK:${keySig}\n` + lines.join('\n') + '\n';
+}
+
+// ---------- Klaviatur mit Fingerzahlen ----------
+// notes: [{ midi, finger }]; Ausschnitt von der weißen Taste unter dem
+// tiefsten bis zur weißen Taste über dem höchsten Ton, mindestens 8 weiße.
+function wuKeyboardSVG(notes) {
+  const fingerOf = new Map();
+  notes.forEach(n => { if (!fingerOf.has(n.midi)) fingerOf.set(n.midi, n.finger); });
+  const midis = notes.map(n => n.midi);
+  const isWhite = m => WHITE_SEMIS.includes(((m % 12) + 12) % 12);
+  let lo = Math.min(...midis), hi = Math.max(...midis);
+  if (!isFinite(lo)) { lo = 60; hi = 72; }
+  while (!isWhite(lo)) lo--;
+  while (!isWhite(hi)) hi++;
+  const whites = [];
+  for (let m = lo; m <= hi; m++) if (isWhite(m)) whites.push(m);
+  while (whites.length < 8) { let m = whites[whites.length - 1] + 1; while (!isWhite(m)) m++; whites.push(m); }
+  const W = 30, H = 112, BW = 18, BH = 70;
+  let white = '', black = '', labels = '';
+  const label = (cx, cy, f, onBlack) =>
+    `<circle cx="${cx}" cy="${cy}" r="10" fill="${onBlack ? '#fff' : 'var(--bg-base)'}"/>`
+    + `<text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="15" font-weight="700" font-family="Inter, sans-serif" fill="${onBlack ? 'var(--bg-base)' : '#fff'}">${f}</text>`;
+  whites.forEach((m, i) => {
+    const x = i * W, f = fingerOf.get(m);
+    white += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="3" fill="${f ? 'var(--accent)' : '#fff'}" stroke="#888" stroke-width="1"/>`;
+    if (f) labels += label(x + W / 2, H - 18, f, false);
+    if (m % 12 === 0) labels += `<text x="${x + W / 2}" y="${H + 14}" text-anchor="middle" font-size="10" font-family="JetBrains Mono, monospace" fill="var(--text-muted)">C${Math.floor(m / 12) - 1}</text>`;
+    const nb = m + 1;
+    if (i < whites.length - 1 && !isWhite(nb)) {
+      const bx = (i + 1) * W - BW / 2, bf = fingerOf.get(nb);
+      black += `<rect x="${bx}" y="0" width="${BW}" height="${BH}" rx="2" fill="${bf ? 'var(--accent-hover)' : '#222'}" stroke="#000" stroke-width="0.5"/>`;
+      if (bf) labels += label(bx + BW / 2, BH - 16, bf, true);
+    }
+  });
+  return `<svg class="wu-kbd-svg" viewBox="0 0 ${whites.length * W} ${H + 18}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Klaviatur mit Fingersatz">${white}${black}${labels}</svg>`;
+}
+
+// abcjs: genau diese Version, nur beim Öffnen des Reiters, mit Prüfsumme.
+const WU_ABCJS = {
+  version: '6.7.1',
+  urls: [
+    'https://cdn.jsdelivr.net/npm/abcjs@6.7.1/dist/abcjs-basic-min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.7.1/abcjs-basic-min.js',
+  ],
+  integrity: 'sha384-gO9mym1Z3WJwxNm4ZpC6ZQbMyiu+72akLTHzztpwTs6KYVd3NnfkQigzPk+Oqzqy',
+};
+
+const WARMUP = (() => {
+const $ = id => document.getElementById(id);
+const BLOCK_SEC = 300;
+const BLOCKS = [
+  { short: '1 Finger', title: 'Block 1 · Fünftonfigur über die Folge' },
+  { short: '2 Tonleiter', title: 'Block 2 · Tonleiter des Tages' },
+  { short: '3 Anwendung', title: 'Block 3 · Improvisieren über die Folge' },
+];
+const state = { semi: null, gb: false, block: 0, sel: 0, left: BLOCK_SEC, paused: false };
+let tick = null, abcLoad = null, playHandles = [], playEnd = null, metroByUs = false, active = false;
+
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem('chordtrainer_warmup') || 'null');
+    if (s && Number.isInteger(s.semi) && s.semi >= 0 && s.semi < 12) { state.semi = s.semi; state.gb = !!s.gb; }
+  } catch (e) { /* ignore */ }
+}
+function save() {
+  try { localStorage.setItem('chordtrainer_warmup', JSON.stringify({ semi: state.semi, gb: state.gb })); } catch (e) { /* ignore */ }
+}
+
+// Folge aus dem Trainer (Bibliothek ist in C notiert, Moll: i = Cm)
+function source() {
+  return (currentProg && PROGRESSIONS.find(p => p.name === currentProg.name)) || PROGRESSIONS[0];
+}
+function model() {
+  const prog = source();
+  const minor = prog.mode === 'minor';
+  if (state.semi === null) state.semi = currentProg && NOTE_TO_SEMI[currentProg.key] !== undefined ? NOTE_TO_SEMI[currentProg.key] : 0;
+  const tonic = wuTonicName(state.semi, state.gb, minor);
+  const chords = wuTransposeChords(prog.chords, 'C', tonic, minor);
+  const figs = chords.map(wuChordFigure).filter(Boolean);
+  const keySig = tonic + (minor ? 'm' : '');
+  const scaleKey = wuScaleKeyFor(tonic, minor);
+  return { prog, minor, tonic, keySig, chords, figs, scaleKey };
+}
+
+// Anzeige mit echten Vorzeichen: Bb → B♭, F#m7b5 → F♯m7♭5
+function pretty(s) {
+  return String(s).replace(/([A-G])#/g, '$1♯').replace(/([A-G])b/g, '$1♭').replace(/b(5|9|13)/g, '♭$1').replace(/#(5|9|11)/g, '♯$1');
+}
+function prettyHTML(s) {
+  return escapeHTML(pretty(s)).replace(/[♭♯]/g, '<span class="acc">$&</span>');
+}
+function keyLabel(name, minor) {
+  return name.replace('#', '♯').replace(/b$/, '♭') + (minor ? 'm' : '');
+}
+function fmt(sec) { const s = Math.max(0, sec); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+
+function renderTimer() {
+  const el = $('wuTimer');
+  el.textContent = state.left > 0 ? fmt(state.left) : 'Zeit um';
+  el.classList.toggle('done', state.left <= 0);
+  el.classList.toggle('paused', state.paused);
+  el.title = state.paused ? 'Pausiert, antippen = weiter' : 'Restzeit im Block, antippen = Pause';
+}
+function startTick() {
+  clearInterval(tick);
+  tick = setInterval(() => {
+    if (!active || state.paused || state.left <= 0) return;
+    state.left--;
+    renderTimer();
+  }, 1000);
+}
+
+function render() {
+  active = true;
+  const M = model();
+  if (state.sel >= M.figs.length) state.sel = 0;
+
+  // Block-Knöpfe
+  $('wuSteps').innerHTML = BLOCKS.map((b, i) =>
+    `<button type="button" class="pill${i === state.block ? ' active' : ''}" data-b="${i}" aria-pressed="${i === state.block}">${b.short}</button>`).join('');
+  $('wuNext').textContent = state.block < 2 ? 'Weiter →' : 'Fertig: nächste Tonart →';
+
+  // Tonart-Pills (Quintenzirkel)
+  const names = M.minor ? WU_MINOR_KEYS : WU_MAJOR_KEYS;
+  $('wuKeyTabs').innerHTML = names.map(n => {
+    const on = n === M.tonic;
+    return `<button type="button" class="pill${on ? ' active' : ''}" data-k="${n}" aria-pressed="${on}">${keyLabel(n, M.minor)}</button>`;
+  }).join('');
+
+  $('wuTitle').textContent = BLOCKS[state.block].title;
+  $('wuSub').textContent = `${M.prog.name} · ${keyLabel(M.tonic, M.minor)}`;
+  renderTimer();
+
+  const sheet = $('warmupView');
+  sheet.classList.toggle('wu-block3', state.block === 2);
+  let abc = '', hint = '', kbdNotes = [], kbdLabel = '', text = '';
+  const fig = M.figs[state.sel];
+  if (state.block === 0) {
+    text = 'Pro Akkord ein Takt Achtel: 1-2-3-4-5-4-3-2, Finger 1–5 bleiben liegen. Der Fünftonraum folgt der Akkordart. Langsam, gleichmäßig, Metronom oben.';
+    abc = wuAbc(M.keySig, wuFigureBars(M.chords));
+    kbdNotes = fig ? fig.notes : [];
+    kbdLabel = fig ? `Rechte Hand · ${pretty(fig.chord)} (${WU_QUALITY_LABEL[fig.quality]})` : '';
+    hint = 'Akkord antippen: Klaviatur zeigt seinen Fünftonraum. Vorspielen spielt die ganze Folge im Metronom-Tempo (Achtel).';
+  } else if (state.block === 1) {
+    const sc = wuMajorScale(M.scaleKey);
+    text = `${keyLabel(M.scaleKey, false)}-Dur, rechte Hand, eine Oktave auf und ab.`
+      + (M.minor ? ` Paralleles Dur zu ${keyLabel(M.tonic, true)}: dieselben Töne wie natürliches Moll.` : '')
+      + ' Daumen untersetzen, ohne das Handgelenk zu drehen.';
+    abc = wuAbc(M.scaleKey, wuScaleBars(M.scaleKey));
+    kbdNotes = sc ? sc.up : [];
+    kbdLabel = `Rechte Hand · ${keyLabel(M.scaleKey, false)}-Dur · Fingersatz ${sc ? sc.up.map(n => n.finger).join('') : ''}`;
+    hint = 'Vorspielen: einmal auf und ab im Metronom-Tempo (Achtel).';
+  } else {
+    text = 'Improvisiere über die Folge, zuerst nur mit den fünf Tönen jedes Akkords aus Block 1, dann mit der Tonleiter aus Block 2. Wechsle den Fünftonraum genau auf dem Akkordwechsel. Ein Akkord pro Takt, Metronom läuft.';
+    kbdNotes = fig ? fig.notes : [];
+    kbdLabel = fig ? `Rechte Hand · Material über ${pretty(fig.chord)}` : '';
+    hint = 'Vorspielen: die fünf Töne jedes Akkords einmal aufwärts, als Erinnerung ans Material.';
+  }
+  $('wuText').textContent = text;
+  $('wuHint').textContent = hint;
+  $('wuKbdLabel').textContent = kbdLabel;
+  $('wuKbd').innerHTML = wuKeyboardSVG(kbdNotes);
+
+  // Akkord-Chips (Block 1 und 3)
+  $('wuChips').innerHTML = state.block === 1 ? '' : M.figs.map((f, i) =>
+    `<button type="button" class="wu-chip${i === state.sel ? ' sel' : ''}" data-i="${i}" title="${escapeHTML(pretty(f.notes.map(n => n.name).join(' ')))}">${prettyHTML(f.chord)}</button>`).join('');
+
+  // Block 3: große Akkordsymbole mit Fünftonraum
+  $('wuBig').innerHTML = state.block !== 2 ? '' : M.figs.map((f, i) =>
+    `<div class="wu-big-chord${i === state.sel ? ' sel' : ''}"><span class="sym">${prettyHTML(f.chord)}</span><span class="tones">${escapeHTML(pretty(f.notes.map(n => n.name).join(' ')))}</span></div>`).join('');
+
+  renderNotes(abc, state.block === 0 ? M.figs.map(f => `${f.chord}: ${WU_FIGURE_IDX.map(i => f.notes[i].name + '(' + f.notes[i].finger + ')').join(' ')}`).join('\n')
+    : state.block === 1 ? (wuMajorScale(M.scaleKey) || { notes: [] }).notes.map(n => n.name + '(' + n.finger + ')').join(' ') : '');
+  updateMetroBtn();
+  updatePlayBtn();
+}
+
+// Noten: abcjs nachladen; ohne abcjs Notennamen mit Fingern als Text
+function renderNotes(abc, fallbackText) {
+  const el = $('wuNotes'), msg = $('wuNotesMsg');
+  el.hidden = !abc;
+  msg.textContent = '';
+  if (!abc) { el.innerHTML = ''; return; }
+  const draw = () => {
+    if (!window.ABCJS || !active) return;
+    try {
+      window.ABCJS.renderAbc(el, abc, { responsive: 'resize', add_classes: true, paddingtop: 6, paddingbottom: 6, paddingleft: 4, paddingright: 4, foregroundColor: '#1a1825' });
+    } catch (e) { showFallback(el, msg, fallbackText, 'Noten konnten nicht gezeichnet werden.'); }
+  };
+  if (window.ABCJS) { draw(); return; }
+  el.innerHTML = '<div class="wu-loading">Noten werden geladen …</div>';
+  loadAbcjs().then(draw, () => showFallback(el, msg, fallbackText,
+    'Noten nicht verfügbar (offline?). Klaviatur und Vorspielen gehen trotzdem; Notennamen mit Finger in Klammern:'));
+}
+function showFallback(el, msg, text, note) {
+  msg.textContent = note;
+  el.innerHTML = `<pre class="wu-fallback">${escapeHTML(text)}</pre>`;
+}
+function loadAbcjs() {
+  if (window.ABCJS) return Promise.resolve(window.ABCJS);
+  if (abcLoad) return abcLoad;
+  abcLoad = new Promise((resolve, reject) => {
+    const tryUrl = i => {
+      if (i >= WU_ABCJS.urls.length) { abcLoad = null; reject(new Error('abcjs nicht ladbar')); return; }
+      const s = document.createElement('script');
+      s.src = WU_ABCJS.urls[i];
+      s.integrity = WU_ABCJS.integrity;
+      s.crossOrigin = 'anonymous';
+      s.async = true;
+      s.onload = () => window.ABCJS ? resolve(window.ABCJS) : tryUrl(i + 1);
+      s.onerror = () => { s.remove(); tryUrl(i + 1); };
+      document.head.appendChild(s);
+    };
+    tryUrl(0);
+  });
+  return abcLoad;
+}
+
+// ---------- Vorspielen (gemeinsamer SYNTH, Tempo vom Metronom) ----------
+function sequence() {
+  const M = model();
+  if (state.block === 0) return wuFigureBars(M.chords).flatMap(b => b.notes);
+  if (state.block === 1) return wuScaleBars(M.scaleKey).flatMap(b => b.notes);
+  return M.figs.flatMap(f => f.notes.map((n, i) => ({ ...n, len: i === 4 ? 4 : 1 })));
+}
+function play() {
+  if (playEnd) { stopPlay(); return; }
+  if (!SYNTH.ensure()) return;
+  const ctx = SYNTH.ctx();
+  const eighth = 30 / metroBpm;
+  let t = ctx.currentTime + 0.08;
+  playHandles = sequence().map(n => {
+    const o = SYNTH.tone(n.midi, t, Math.max(0.12, eighth * (n.len || 1) * 0.92), 'triangle', 0.28);
+    t += eighth * (n.len || 1);
+    return o;
+  });
+  playEnd = setTimeout(() => { playEnd = null; playHandles = []; updatePlayBtn(); }, (t - ctx.currentTime) * 1000 + 150);
+  updatePlayBtn();
+}
+function stopPlay() {
+  playHandles.forEach(o => { try { o.stop(); } catch (e) { /* schon gestoppt */ } try { o.disconnect(); } catch (e) { /* ignore */ } });
+  playHandles = [];
+  clearTimeout(playEnd); playEnd = null;
+  updatePlayBtn();
+}
+function updatePlayBtn() {
+  $('wuPlay').textContent = playEnd ? '■ Stopp' : '▶ Vorspielen';
+}
+function updateMetroBtn() {
+  if (!active) return;
+  const b = $('wuMetro');
+  b.classList.toggle('active', metroRunning);
+  b.setAttribute('aria-pressed', String(metroRunning));
+  b.textContent = metroRunning ? `♩ ${metroBpm} an` : '♩ Metronom';
+}
+
+// ---------- Ablauf ----------
+function setBlock(b) {
+  stopPlay();
+  state.block = b;
+  state.left = BLOCK_SEC;
+  state.paused = false;
+  // Block 3: Metronom starten (Klick ist eine Nutzeraktion, iOS erlaubt Ton)
+  if (b === 2 && !metroRunning) { startMetronome(); metroByUs = true; }
+  if (b !== 2 && metroByUs) { if (metroRunning) stopMetronome(); metroByUs = false; }
+  render();
+}
+function setKey(semi, gb) {
+  stopPlay();
+  state.semi = ((semi % 12) + 12) % 12;
+  state.gb = !!gb;
+  state.sel = 0;
+  save();
+  render();
+}
+// Eine Quinte weiter im Quintenzirkel; nach Fis/Ges kommt Des.
+function nextKey() {
+  setKey(state.semi + 7, false);
+}
+function next() {
+  if (state.block < 2) setBlock(state.block + 1);
+  else { nextKey(); setBlock(0); }
+}
+function leave() {
+  active = false;
+  stopPlay();
+  if (metroByUs) { if (metroRunning) stopMetronome(); metroByUs = false; }
+}
+
+load();
+startTick();
+$('wuSteps').addEventListener('click', e => { const b = e.target.closest && e.target.closest('button'); if (b) setBlock(+b.dataset.b); });
+$('wuKeyTabs').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('button'); if (!b) return;
+  setKey(NOTE_TO_SEMI[b.dataset.k], b.dataset.k === 'Gb');
+});
+$('wuNextKey').addEventListener('click', () => { nextKey(); setBlock(0); });
+$('wuNext').addEventListener('click', next);
+$('wuPlay').addEventListener('click', play);
+$('wuMetro').addEventListener('click', () => { toggleMetronome(); metroByUs = false; updateMetroBtn(); });
+$('wuTimer').addEventListener('click', () => { state.paused = !state.paused; renderTimer(); });
+$('wuChips').addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('.wu-chip'); if (!b) return;
+  state.sel = +b.dataset.i;
+  render();
+  // Fünftonraum kurz anspielen
+  const f = model().figs[state.sel];
+  if (f && !playEnd && SYNTH.ensure()) {
+    const t = SYNTH.ctx().currentTime + 0.03;
+    f.notes.forEach((n, i) => SYNTH.tone(n.midi, t + i * 0.16, 0.3, 'triangle', 0.22));
+  }
+});
+document.addEventListener('keydown', e => {
+  if (currentView !== 'warmup') return;
+  const tag = e.target && e.target.tagName;
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if (e.code === 'Space' && tag !== 'BUTTON') { e.preventDefault(); play(); }
+  else if (e.code === 'ArrowRight') next();
+});
+return { render, leave };
+})();
 
 buildPills('styleFilter', STYLES, () => activeStyle, s => { activeStyle = s; });
 buildPills('diffFilter', DIFFICULTIES, () => activeDifficulty, d => { activeDifficulty = d; });
