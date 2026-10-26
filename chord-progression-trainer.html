@@ -1653,6 +1653,40 @@ const PROGRESSIONS = [
     chords: ["Fm7", "Bb7", "Cmaj7"],
     roman: ["iv7", "bVII7", "Imaj7"] },
 
+  // ---------- JAZZY CHORD PROGRESSIONS ----------
+  // 10 Folgen zum Ausprobieren am Klavier. Idee: Denilson Silva.
+  // Notiert in C; Tonart der Vorlage als Referenz im Feld originalKey.
+  { name: "1 · II–V–I–VI", style: "Jazzy Chord Progressions", difficulty: "standard", mode: "major", originalKey: "C",
+    chords: ["Dm7", "G7", "Cmaj7", "Am7"],
+    roman: ["ii7", "V7", "Imaj7", "vi7"] },
+  { name: "2 · I–II–V–I", style: "Jazzy Chord Progressions", difficulty: "standard", mode: "major", originalKey: "F",
+    chords: ["Cmaj7", "Dm7", "G7", "Cmaj7"],
+    roman: ["Imaj7", "ii7", "V7", "Imaj7"] },
+  { name: "3 · I–VI7–II–V", style: "Jazzy Chord Progressions", difficulty: "standard", mode: "major", originalKey: "C",
+    chords: ["Cmaj7", "A7", "Dm7", "G7"],
+    roman: ["Imaj7", "V7/ii", "ii7", "V7"] },
+  { name: "4 · I–IV9, dann II–V zur VI", style: "Jazzy Chord Progressions", difficulty: "jazz", mode: "major", originalKey: "Bb",
+    chords: ["Cmaj7", "F9", "Bm7b5", "E7"],
+    roman: ["Imaj7", "IV9", "viiø", "V7/vi"] },
+  { name: "5 · II–V–I–VI (wie 1)", style: "Jazzy Chord Progressions", difficulty: "standard", mode: "major", originalKey: "D",
+    chords: ["Dm7", "G7", "Cmaj7", "Am7"],
+    roman: ["ii7", "V7", "Imaj7", "vi7"] },
+  { name: "6 · II–V–I zur IV, dann zur I", style: "Jazzy Chord Progressions", difficulty: "jazz", mode: "major", originalKey: "C",
+    chords: ["Gm7", "C7", "Fmaj7", "Dm7", "G7", "Cmaj7"],
+    roman: ["v7", "V7/IV", "IVmaj7", "ii7", "V7", "Imaj7"] },
+  { name: "7 · II–V–I–IV", style: "Jazzy Chord Progressions", difficulty: "standard", mode: "major", originalKey: "G",
+    chords: ["Dm7", "G7", "Cmaj7", "Fmaj7"],
+    roman: ["ii7", "V7", "Imaj7", "IVmaj7"] },
+  { name: "8 · Quartenkette maj7 / 7", style: "Jazzy Chord Progressions", difficulty: "jazz", mode: "major", originalKey: "Eb",
+    chords: ["Cmaj7", "F7", "Bbmaj7", "Eb7"],
+    roman: ["Imaj7", "IV7", "bVIImaj7", "bIII7"] },
+  { name: "9 · IIIø–VI7–II–V", style: "Jazzy Chord Progressions", difficulty: "jazz", mode: "major", originalKey: "D",
+    chords: ["Em7b5", "A7", "Dm7", "G7"],
+    roman: ["iiiø", "V7/ii", "ii7", "V7"] },
+  { name: "10 · II–V–III–VI–II–V–I", style: "Jazzy Chord Progressions", difficulty: "jazz", mode: "major", originalKey: "C",
+    chords: ["Dm7", "G7", "Em7", "A7", "Dm7", "G7", "Cmaj7"],
+    roman: ["ii7", "V7", "iii7", "V7/ii", "ii7", "V7", "Imaj7"] },
+
   // ---------- POP / ROCK ----------
   { name: "I–V–vi–IV", style: "pop", difficulty: "easy", mode: "major",
     chords: ["C", "G", "Am", "F"],
@@ -1808,7 +1842,7 @@ const PROGRESSIONS = [
     roman: ["I", "bVII", "IV", "I"] }
 ];
 
-const STYLES = ["alle", "jazz", "pop", "blues", "folk", "bossa", "modal", "karaoke"];
+const STYLES = ["alle", "jazz", "Jazzy Chord Progressions", "pop", "blues", "folk", "bossa", "modal", "karaoke"];
 const DIFFICULTIES = ["alle", "easy", "standard", "jazz"];
 const KEYS = ["zufällig", "C", "Db", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
 
@@ -1970,12 +2004,14 @@ function weightedPick(pool) {
 //   maj7  A: 3-5-7-9    B: 7-9-3-5
 //   m7    A: b3-5-b7-9  B: b7-9-b3-5
 //   7     A: 3-13-b7-9  B: b7-9-3-13
+//   9     A: 3-5-b7-9   B: b7-9-3-5   (Dominante mit None)
 //   m7b5  nur Shell + Akkordtöne (Rootless-Konvention uneinheitlich)
 // ============================================================
 const VOICING_DEFS = {
   'maj7': { shell: [4, 11],  A: [4, 7, 11, 14],   B: [11, 14, 16, 19] },
   'm7':   { shell: [3, 10],  A: [3, 7, 10, 14],   B: [10, 14, 15, 19] },
   '7':    { shell: [4, 10],  A: [4, 9, 10, 14],   B: [10, 14, 16, 21] },
+  '9':    { shell: [4, 10],  A: [4, 7, 10, 14],   B: [10, 14, 16, 19] },
   'm7b5': { shell: [3, 10],  tones: [0, 3, 6, 10] },
   'm':    { tones: [0, 3, 7] },
   '':     { tones: [0, 4, 7] }

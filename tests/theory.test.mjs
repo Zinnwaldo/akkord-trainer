@@ -43,6 +43,7 @@ function expectedQualities(deg, isDominantFunction) {
   const s = deg.suffix;
   if (/ø/.test(s) || /m7b5/.test(s)) return new Set(['m7b5']);
   if (/maj7/.test(s)) return new Set(['maj7']);
+  if (s === '9') return deg.upper ? new Set(['9']) : new Set(['m9']);
   if (/(^|[^a-z])7/.test(s) || s === '7') {
     return deg.upper ? new Set(['7']) : new Set(['m7']);
   }
